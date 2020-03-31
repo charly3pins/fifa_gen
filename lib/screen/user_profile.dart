@@ -1,4 +1,4 @@
-import 'main.dart';
+import '../model/user.dart';
 
 import 'package:flutter/material.dart';
 
@@ -51,7 +51,7 @@ class UserProfilePage extends StatelessWidget {
     );
 
     return Text(
-      user.name + " ("+user.username+")",
+      user.name + " (" + user.username + ")",
       style: _nameTextStyle,
     );
   }
