@@ -8,10 +8,10 @@ enum AuthMode { LOGIN, SIGNUP }
 
 class LoginPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginPageScreen createState() => _LoginPageScreen();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageScreen extends State<LoginPage> {
   // To adjust the layout according to the screen size
   // so that our layout remains responsive ,we need to
   // calculate the screen height
@@ -157,12 +157,9 @@ class _LoginPageState extends State<LoginPage> {
                                   ""; // TODO check how to improve this cleaning method
                               FifaGenAPI().login(_user).then((usr) {
                                 // Navigate to new page without back
-                                // TODO Navigator.pushReplacement(context,
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) {
-                                  // TODO resume page
-                                  return UserProfilePage(user: usr);
-                                }));
+                                // TODO Navigator.pushNamedReplacement(context,
+                                Navigator.pushNamed(context, "/home",
+                                    arguments: usr);
                               }).catchError((e) {
                                 // TODO improve this error check
                                 showDialog(
@@ -308,12 +305,9 @@ class _LoginPageState extends State<LoginPage> {
                               form.save();
                               FifaGenAPI().createUser(_user).then((usr) {
                                 // Navigate to new page without back
-                                // TODO Navigator.pushReplacement(context,
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) {
-                                  // TODO profile page
-                                  return UserProfilePage(user: usr);
-                                }));
+                                // TODO Navigator.pushNamedReplacement(context,
+                                Navigator.pushNamed(context, "/userprofile",
+                                    arguments: usr);
                               }).catchError((e) {
                                 // TODO improve this error check
                                 showDialog(

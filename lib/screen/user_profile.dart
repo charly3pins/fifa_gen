@@ -2,8 +2,9 @@ import '../model/user.dart';
 
 import 'package:flutter/material.dart';
 
-class UserProfilePage extends StatelessWidget {
-  final User user;
+// ignore: must_be_immutable
+class UserProfileScreen extends StatelessWidget {
+  User user;
 
   //final String _status = "Software Developer";
   //final String _bio = "\"Hi, I am a Freelance developer working for hourly basis. If you wants to contact me to build your product leave a message.\"";
@@ -142,6 +143,7 @@ class UserProfilePage extends StatelessWidget {
     );
   }*/
 
+  /*
   Widget _buildSeparator(Size screenSize) {
     return Container(
       width: screenSize.width / 1.6,
@@ -150,7 +152,8 @@ class UserProfilePage extends StatelessWidget {
       margin: EdgeInsets.only(top: 4.0),
     );
   }
-
+*/
+  /*
   Widget _buildGetInTouch(BuildContext context) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -161,8 +164,8 @@ class UserProfilePage extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildButtons() {
+*/
+  /*Widget _buildButtons() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Row(
@@ -213,12 +216,14 @@ class UserProfilePage extends StatelessWidget {
       ),
     );
   }
-
+*/
   // In the constructor, require a User
-  UserProfilePage({Key key, @required this.user}) : super(key: key);
+  //UserProfileScreen({Key key, @required this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    user = ModalRoute.of(context).settings.arguments;
+
     Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
@@ -234,11 +239,11 @@ class UserProfilePage extends StatelessWidget {
                   //_buildStatus(context),
                   _buildStatContainer(),
                   //_buildBio(context),
-                  _buildSeparator(screenSize),
+                 // _buildSeparator(screenSize),
                   SizedBox(height: 10.0),
-                  _buildGetInTouch(context),
-                  SizedBox(height: 8.0),
-                  _buildButtons(),
+                  //_buildGetInTouch(context),
+                  //SizedBox(height: 8.0),
+                  //_buildButtons(),
                 ],
               ),
             ),
