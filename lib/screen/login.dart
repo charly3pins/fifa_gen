@@ -23,7 +23,7 @@ class _LoginPageScreen extends State<LoginPage> {
   final _user = User();
 
   // Set initial mode to login
-  AuthMode _authMode = AuthMode.SIGNUP;
+  AuthMode _authMode = AuthMode.LOGIN;
 
   @override
   Widget build(BuildContext context) {

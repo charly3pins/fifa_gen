@@ -35,10 +35,6 @@ class UserProfileScreen extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(80.0),
-          border: Border.all(
-            color: Colors.white,
-            width: 10.0,
-          ),
         ),
       ),
     );
@@ -46,7 +42,7 @@ class UserProfileScreen extends StatelessWidget {
 
   Widget _buildFullName() {
     TextStyle _nameTextStyle = TextStyle(
-      color: Colors.black,
+      color: Colors.white,
       fontSize: 28.0,
       fontWeight: FontWeight.w700,
     );
@@ -225,31 +221,61 @@ class UserProfileScreen extends StatelessWidget {
     user = ModalRoute.of(context).settings.arguments;
 
     Size screenSize = MediaQuery.of(context).size;
-    return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          _buildCoverImage(screenSize),
-          SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  SizedBox(height: screenSize.height / 6.4),
-                  _buildProfileImage(),
-                  _buildFullName(),
-                  //_buildStatus(context),
-                  _buildStatContainer(),
-                  //_buildBio(context),
-                 // _buildSeparator(screenSize),
-                  SizedBox(height: 10.0),
-                  //_buildGetInTouch(context),
-                  //SizedBox(height: 8.0),
-                  //_buildButtons(),
-                ],
-              ),
+
+    return Stack(
+      children: <Widget>[
+        Container(
+          height: double.infinity,
+          width: double.infinity,
+          decoration: new BoxDecoration(
+            color: Colors.black,
+            image: new DecorationImage(
+              image: new AssetImage("assets/fifa-20-bg.jpeg"),
+              fit: BoxFit.cover,
             ),
           ),
-        ],
-      ),
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: new AppBar(
+            backgroundColor: Colors.transparent,
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.settings,
+                color: Colors.white,),
+                // TODO implement settings page
+                //onPressed: () {},
+              )
+            ],
+          ),
+          body: Stack(
+            children: <Widget>[
+              _buildCoverImage(screenSize),
+              SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      //SizedBox(height: screenSize.height / 6.4),
+                      _buildProfileImage(),
+                      SizedBox(height: 10.0),
+                      _buildFullName(),
+                      //_buildStatus(context),
+                      SizedBox(height: 30.0),
+                      _buildStatContainer(),
+                      //_buildBio(context),
+                      // _buildSeparator(screenSize),
+                      SizedBox(height: 10.0),
+                      //_buildGetInTouch(context),
+                      //SizedBox(height: 8.0),
+                      //_buildButtons(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

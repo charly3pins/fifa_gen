@@ -17,13 +17,13 @@ class _HomeScreenState extends State<HomeScreen> {
       Card(
         child: ListTile(
             leading: Icon(Icons.calendar_today),
-            title: Text("Tottenham - Juventus")
+            title: Text("Tottenham - Juventus (Challenge Covid)")
         ),
       ),
       Card(
         child: ListTile(
             leading: Icon(Icons.calendar_today),
-            title: Text("PSG - Liverpool")
+            title: Text("PSG - Liverpool  (Challenge Covid)")
         ),
       )
     ],
@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Card(
         child: ListTile(
             leading: Icon(Icons.toys),
-            title: Text("Challenge Covid")
+            title: Text("Challenge Covid (Pollitas team)")
         ),
       )
     ],
@@ -56,57 +56,74 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.person),
-          tooltip: 'Profile',
-          onPressed: () {
-            String jsonString = '{"name": "gerry", "username": "cal_tit"}';
-            Map<String, dynamic> user = json.decode(jsonString);
-            Navigator.pushNamed(context, "/userprofile",
-                arguments: User.fromJSON(user));
-          },
+    return Stack(
+      children: <Widget>[
+        Container(
+          height: double.infinity,
+          width: double.infinity,
+          decoration: new BoxDecoration(
+            color: Colors.black,
+            image: new DecorationImage(
+              image: new AssetImage("assets/fifa-20-bg.jpeg"),
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            tooltip: 'Notifications',
-            onPressed: () {
-              //scaffoldKey.currentState.showSnackBar(snackBar);
-            },
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            leading: IconButton(
+              icon: const Icon(Icons.person),
+              tooltip: 'Profile',
+              onPressed: () {
+                String jsonString = '{"name": "gerry", "username": "cal_tit"}';
+                Map<String, dynamic> user = json.decode(jsonString);
+                Navigator.pushNamed(context, "/userprofile",
+                    arguments: User.fromJSON(user));
+              },
+            ),
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.notifications),
+                tooltip: 'Notifications',
+                onPressed: () {
+                  //scaffoldKey.currentState.showSnackBar(snackBar);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.search),
+                tooltip: 'Search',
+                onPressed: () {
+                  //openPage(context);
+                },
+              ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.search),
-            tooltip: 'Search',
-            onPressed: () {
-              //openPage(context);
-            },
+          body: Center(
+            child: _widgetOptions.elementAt(_selectedIndex),
           ),
-        ],
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            title: Text('Calendar'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.format_list_bulleted),
-            title: Text('Tournaments'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            title: Text('Groups'),
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-      ),
+            bottomNavigationBar: BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.calendar_today),
+                  title: Text('Calendar'),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.format_list_bulleted),
+                  title: Text('Tournaments'),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.people),
+                  title: Text('Groups'),
+                ),
+              ],
+              currentIndex: _selectedIndex,
+              selectedItemColor: Colors.amber[800],
+              onTap: _onItemTapped,
+            ),
+        ),
+      ],
     );
   }
 }
