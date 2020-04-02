@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Card(
         child: ListTile(
             leading: Icon(Icons.calendar_today),
-            title: Text("Tottenham - Juventus (Challenge Covid)")
+            title: Text("Arsenal - Juventus (Challenge Covid)")
         ),
       ),
       Card(
@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Card(
         child: ListTile(
             leading: Icon(Icons.toys),
-            title: Text("Challenge Covid (Pollitas team)")
+            title: Text("Challenge Covid (Brothers team)")
         ),
       )
     ],
@@ -74,10 +74,20 @@ class _HomeScreenState extends State<HomeScreen> {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             leading: IconButton(
-              icon: const Icon(Icons.person),
+              icon: Container(
+                width: 140.0,
+                height: 140.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/law-mustache-thumb.png'),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(80.0),
+                ),
+              ),
               tooltip: 'Profile',
               onPressed: () {
-                String jsonString = '{"name": "gerry", "username": "cal_tit"}';
+                String jsonString = '{"name": "Carles", "username": "charly3pins"}';
                 Map<String, dynamic> user = json.decode(jsonString);
                 Navigator.pushNamed(context, "/userprofile",
                     arguments: User.fromJSON(user));
@@ -89,13 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 tooltip: 'Notifications',
                 onPressed: () {
                   //scaffoldKey.currentState.showSnackBar(snackBar);
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.search),
-                tooltip: 'Search',
-                onPressed: () {
-                  //openPage(context);
                 },
               ),
             ],
@@ -119,7 +122,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
               currentIndex: _selectedIndex,
-              selectedItemColor: Colors.amber[800],
+              backgroundColor: Colors.transparent ,
+              unselectedItemColor: Colors.white,
+              selectedItemColor: Colors.amberAccent,
               onTap: _onItemTapped,
             ),
         ),

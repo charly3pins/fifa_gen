@@ -31,7 +31,7 @@ class UserProfileScreen extends StatelessWidget {
         height: 140.0,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/gerard.jpg'),
+            image: AssetImage('assets/law-mustache-thumb.png'),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(80.0),
