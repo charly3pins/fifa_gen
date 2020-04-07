@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class UserProfileScreen extends StatelessWidget {
-  User user;
+  User loggedUser;
 
   //final String _status = "Software Developer";
   //final String _bio = "\"Hi, I am a Freelance developer working for hourly basis. If you wants to contact me to build your product leave a message.\"";
@@ -48,7 +48,7 @@ class UserProfileScreen extends StatelessWidget {
     );
 
     return Text(
-      user.name + " (" + user.username + ")",
+      loggedUser.name + " (" + loggedUser.username + ")",
       style: _nameTextStyle,
     );
   }
@@ -218,7 +218,7 @@ class UserProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    user = ModalRoute.of(context).settings.arguments;
+    loggedUser = ModalRoute.of(context).settings.arguments;
 
     Size screenSize = MediaQuery.of(context).size;
 

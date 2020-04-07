@@ -9,6 +9,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  User loggedUser;
+
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
@@ -56,6 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    loggedUser = ModalRoute.of(context).settings.arguments;
+
     return Stack(
       children: <Widget>[
         Container(
@@ -87,10 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               tooltip: 'Profile',
               onPressed: () {
-                String jsonString = '{"name": "Carles", "username": "charly3pins"}';
-                Map<String, dynamic> user = json.decode(jsonString);
                 Navigator.pushNamed(context, "/userprofile",
-                    arguments: User.fromJSON(user));
+                    arguments: loggedUser);
               },
             ),
             actions: <Widget>[

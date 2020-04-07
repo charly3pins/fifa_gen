@@ -155,11 +155,11 @@ class _LoginPageScreen extends State<LoginPage> {
                               form.save();
                               _user.name =
                                   ""; // TODO check how to improve this cleaning method
-                              FifaGenAPI().login(_user).then((usr) {
+                              FifaGenAPI().login(_user).then((loggedUser) {
                                 // Navigate to new page without back
                                 // TODO Navigator.pushNamedReplacement(context,
                                 Navigator.pushNamed(context, "/home",
-                                    arguments: usr);
+                                    arguments: loggedUser);
                               }).catchError((e) {
                                 // TODO improve this error check
                                 showDialog(
