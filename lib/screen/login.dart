@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 
 enum AuthMode { LOGIN, SIGNUP }
 
-class LoginPage extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   @override
   _LoginPageScreen createState() => _LoginPageScreen();
 }
 
-class _LoginPageScreen extends State<LoginPage> {
+class _LoginPageScreen extends State<LoginScreen> {
   // To adjust the layout according to the screen size
   // so that our layout remains responsive ,we need to
   // calculate the screen height
@@ -306,7 +306,7 @@ class _LoginPageScreen extends State<LoginPage> {
                               FifaGenAPI().createUser(_user).then((usr) {
                                 // Navigate to new page without back
                                 // TODO Navigator.pushNamedReplacement(context,
-                                Navigator.pushNamed(context, "/userprofile",
+                                Navigator.pushNamed(context, "/myprofile",
                                     arguments: usr);
                               }).catchError((e) {
                                 // TODO improve this error check

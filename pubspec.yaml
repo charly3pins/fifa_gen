@@ -44,7 +44,23 @@ flutter:
   assets:
     - assets/fifa-20-bg.jpeg
     - assets/law-mustache-thumb.png
-    - assets/gerard.jpg
+    - assets/profile/avatar-default.png
+    - assets/profile/128_1.png
+    - assets/profile/128_2.png
+    - assets/profile/128_3.png
+    - assets/profile/128_4.png
+    - assets/profile/128_5.png
+    - assets/profile/128_6.png
+    - assets/profile/128_7.png
+    - assets/profile/128_8.png
+    - assets/profile/128_9.png
+    - assets/profile/128_10.png
+    - assets/profile/128_11.png
+    - assets/profile/128_12.png
+    - assets/profile/128_13.png
+    - assets/profile/128_14.png
+    - assets/profile/128_15.png
+    - assets/profile/128_16.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class UserProfileScreen extends StatelessWidget {
-  User loggedUser;
+  User _loggedUser;
+  final String _genericAvatar = "avatar-default.png";
 
   //final String _status = "Software Developer";
   //final String _bio = "\"Hi, I am a Freelance developer working for hourly basis. If you wants to contact me to build your product leave a message.\"";
@@ -31,7 +32,11 @@ class UserProfileScreen extends StatelessWidget {
         height: 140.0,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/law-mustache-thumb.png'),
+            image: AssetImage("assets/profile/" +
+                (_loggedUser.profilePicture != null &&
+                        _loggedUser.profilePicture.isNotEmpty
+                    ? _loggedUser.profilePicture
+                    : _genericAvatar)),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(80.0),
@@ -48,7 +53,7 @@ class UserProfileScreen extends StatelessWidget {
     );
 
     return Text(
-      loggedUser.name + " (" + loggedUser.username + ")",
+      _loggedUser.name + " (" + _loggedUser.username + ")",
       style: _nameTextStyle,
     );
   }
@@ -161,7 +166,7 @@ class UserProfileScreen extends StatelessWidget {
     );
   }
 */
-  /*Widget _buildButtons() {
+  Widget _buildButtons() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Row(
@@ -195,13 +200,17 @@ class UserProfileScreen extends StatelessWidget {
                 height: 40.0,
                 decoration: BoxDecoration(
                   border: Border.all(),
+                  color: Color(0xFF404A5C),
                 ),
                 child: Center(
                   child: Padding(
                     padding: EdgeInsets.all(10.0),
                     child: Text(
                       "MESSAGE",
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -212,13 +221,10 @@ class UserProfileScreen extends StatelessWidget {
       ),
     );
   }
-*/
-  // In the constructor, require a User
-  //UserProfileScreen({Key key, @required this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    loggedUser = ModalRoute.of(context).settings.arguments;
+    _loggedUser = ModalRoute.of(context).settings.arguments;
 
     Size screenSize = MediaQuery.of(context).size;
 
@@ -239,14 +245,6 @@ class UserProfileScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           appBar: new AppBar(
             backgroundColor: Colors.transparent,
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.settings,
-                color: Colors.white,),
-                // TODO implement settings page
-                //onPressed: () {},
-              )
-            ],
           ),
           body: Stack(
             children: <Widget>[
@@ -267,7 +265,7 @@ class UserProfileScreen extends StatelessWidget {
                       SizedBox(height: 10.0),
                       //_buildGetInTouch(context),
                       //SizedBox(height: 8.0),
-                      //_buildButtons(),
+                      _buildButtons(),
                     ],
                   ),
                 ),

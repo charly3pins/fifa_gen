@@ -24,10 +24,27 @@ class FifaGenAPI {
     final response = await http.post(baseURL + "/token",
         headers: {"Content-Type": 'application/json'}, body: jsonBody);
 
-    print(response.statusCode);
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       return User.fromJSON(jsonData);
+    }
+
+    return Future.error(response.body);
+  }
+
+  Future<List<User>> findUsers(String username) async {
+    final response = await http.get(
+        baseURL + "/users" + "?username=" + username,
+        headers: {"Content-Type": 'application/json'});
+
+    List<User> users = [];
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      for (var i = 0; i < jsonData.length; i++) {
+        users.add(User.fromJSON(jsonData[i]));
+      }
+
+      return users;
     }
 
     return Future.error(response.body);

@@ -1,10 +1,13 @@
+import 'package:flutter/foundation.dart';
+
 class User {
   final String id;
   String name;
   String username;
   String password;
+  String profilePicture;
 
-  User({this.id, this.name, this.username, this.password});
+  User({this.id, this.name, this.username, this.password, this.profilePicture});
 
   factory User.fromJSON(Map<String, dynamic> parsedJson) {
     return User(
@@ -12,6 +15,7 @@ class User {
       name: parsedJson['name'],
       username: parsedJson['username'],
       password: parsedJson['password'],
+      profilePicture: parsedJson['profilePicture'],
     );
   }
 
@@ -19,5 +23,6 @@ class User {
         "name": name,
         "username": username,
         "password": password,
+        "profilePicture": profilePicture,
       };
 }
