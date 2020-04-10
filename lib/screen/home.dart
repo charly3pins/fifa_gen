@@ -1,6 +1,6 @@
 import 'package:fifagen/model/user.dart';
 import 'package:fifagen/screen/groups.dart';
-
+import 'package:fifagen/service/fifa_gen_api.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:convert';
@@ -13,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   User _loggedUser;
   final String _genericAvatar = "avatar-default.png";
+  int _notifications;
 
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
@@ -47,6 +48,65 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+    });
+  }
+
+  Widget _buildNotificationsCounter() {
+    if (_notifications != null && _notifications > 0){
+    return Container(
+      width: 40,
+      height: 40,
+      alignment: Alignment.topRight,
+      margin: EdgeInsets.only(top: 5),
+      child: Container(
+        width: 15,
+        height: 15,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color(0xffc32c37),
+            border: Border.all(color: Colors.white, width: 1)),
+        child: Padding(
+          padding: const EdgeInsets.all(0.0),
+          child: Center(
+            child: Text(
+              _notifications.toString(),
+              style: TextStyle(fontSize: 10),
+            ),
+          ),
+        ),
+      ),
+    );}
+    return Container();
+  }
+  Widget _buildNotificationsIcon() {
+    return Container(
+      width: 40,
+      height: 40,
+      child: Stack(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            tooltip: 'Notifications',
+            onPressed: () {},
+            iconSize: 30,
+          ),
+          _buildNotificationsCounter(),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      FifaGenAPI().getNotifications(_loggedUser.id).then((notifications) {
+        _notifications = notifications;
+      }).catchError((e) {
+        // TODO improve this error check
+        showDialog(
+            context: context, builder: (_) => AlertDialog(title: Text(e)));
+      });
     });
   }
 
@@ -91,15 +151,10 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.notifications),
-                tooltip: 'Notifications',
-                onPressed: () {
-                  //scaffoldKey.currentState.showSnackBar(snackBar);
-                },
-              ),
+              _buildNotificationsIcon(),
               IconButton(
                 icon: const Icon(Icons.search),
+                iconSize: 30,
                 tooltip: 'Search',
                 onPressed: () {
                   Navigator.pushNamed(context, "/search",

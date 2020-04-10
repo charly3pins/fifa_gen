@@ -1,16 +1,24 @@
-import '../model/user.dart';
-
+import 'package:fifagen/model/friend.dart';
+import 'package:fifagen/model/user.dart';
+import 'package:fifagen/service/fifa_gen_api.dart';
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
-class UserProfileScreen extends StatelessWidget {
+enum RequestState { ACCEPTED, PENDING, REQUESTED }
+
+class UserProfileScreen extends StatefulWidget {
+  @override
+  _UserProfileScreen createState() => _UserProfileScreen();
+}
+
+class _UserProfileScreen extends State<UserProfileScreen> {
+  List<User> _argUsers;
   User _loggedUser;
+  User _profileUser;
+  RequestState _requestState;
+
   final String _genericAvatar = "avatar-default.png";
 
-  //final String _status = "Software Developer";
-  //final String _bio = "\"Hi, I am a Freelance developer working for hourly basis. If you wants to contact me to build your product leave a message.\"";
   final String _friends = "16";
-  //final String _posts = "24";
   final String _scores = "450";
 
   Widget _buildCoverImage(Size screenSize) {
@@ -33,9 +41,9 @@ class UserProfileScreen extends StatelessWidget {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/profile/" +
-                (_loggedUser.profilePicture != null &&
-                        _loggedUser.profilePicture.isNotEmpty
-                    ? _loggedUser.profilePicture
+                (_profileUser.profilePicture != null &&
+                        _profileUser.profilePicture.isNotEmpty
+                    ? _profileUser.profilePicture
                     : _genericAvatar)),
             fit: BoxFit.cover,
           ),
@@ -53,29 +61,10 @@ class UserProfileScreen extends StatelessWidget {
     );
 
     return Text(
-      _loggedUser.name + " (" + _loggedUser.username + ")",
+      _profileUser.name + " (" + _profileUser.username + ")",
       style: _nameTextStyle,
     );
   }
-
-  /*Widget _buildStatus(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 6.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(4.0),
-      ),
-      child: Text(
-        _status,
-        style: TextStyle(
-          fontFamily: 'Spectral',
-          color: Colors.black,
-          fontSize: 20.0,
-          fontWeight: FontWeight.w300,
-        ),
-      ),
-    );
-  }*/
 
   Widget _buildStatItem(String label, String count) {
     TextStyle _statLabelTextStyle = TextStyle(
@@ -117,114 +106,198 @@ class UserProfileScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           _buildStatItem("Friends", _friends),
-          //_buildStatItem("Posts", _posts),
           _buildStatItem("Scores", _scores),
         ],
       ),
     );
   }
 
-  /*Widget _buildBio(BuildContext context) {
-    TextStyle bioTextStyle = TextStyle(
-      fontFamily: 'Spectral',
-      fontWeight: FontWeight.w400,//try changing weight to w500 if not thin
-      fontStyle: FontStyle.italic,
-      color: Color(0xFF799497),
-      fontSize: 16.0,
-    );
-
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      padding: EdgeInsets.all(8.0),
-      child: Text(
-        _bio,
-        textAlign: TextAlign.center,
-        style: bioTextStyle,
-      ),
-    );
-  }*/
-
-  /*
-  Widget _buildSeparator(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.6,
-      height: 2.0,
-      color: Colors.black54,
-      margin: EdgeInsets.only(top: 4.0),
-    );
-  }
-*/
-  /*
-  Widget _buildGetInTouch(BuildContext context) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      padding: EdgeInsets.only(top: 8.0),
-      child: Text(
-        "Get in Touch with ${user.name},",
-        style: TextStyle(fontFamily: 'Roboto', fontSize: 16.0),
+  // TODO add option for UNFOLLOW
+  Widget _buildAccepted() {
+    return Expanded(
+      child: InkWell(
+        child: Container(
+          height: 40.0,
+          decoration: BoxDecoration(
+            border: Border.all(),
+            color: Color(0xFFEFF4F7),
+          ),
+          child: Center(
+            child: Text(
+              "FOLLOWING",
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                color: Colors.black,
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
-*/
+
+  Widget _buildFollow() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Friend friend = Friend(
+              id: "",
+              receiver: _profileUser.id,
+              sender: _loggedUser.id,
+              state: "REQUESTED");
+          FifaGenAPI().sendFriendRequest(friend).then((friendRequest) {
+            setState(() {
+              _requestState = RequestState.REQUESTED;
+              showDialog(
+                  context: context,
+                  builder: (_) =>
+                      // TODO improve
+                      AlertDialog(title: Text("Friend request sent.")));
+            });
+          }).catchError((e) {
+            // TODO improve this error check
+            showDialog(
+                context: context, builder: (_) => AlertDialog(title: Text(e)));
+          });
+        },
+        child: Container(
+          height: 40.0,
+          decoration: BoxDecoration(
+            border: Border.all(),
+            color: Color(0xFF404A5C),
+          ),
+          child: Center(
+            child: Text(
+              "FOLLOW",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRequested() {
+    return Expanded(
+      child: InkWell(
+        child: Container(
+          height: 40.0,
+          decoration: BoxDecoration(
+            border: Border.all(),
+            color: Color(0xFFEFF4F7),
+          ),
+          child: Center(
+            child: Text(
+              "REQUESTED...",
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                color: Colors.black,
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessage() {
+    return Expanded(
+      child: InkWell(
+        onTap: () => print("Message"),
+        child: Container(
+          height: 40.0,
+          decoration: BoxDecoration(
+            border: Border.all(),
+            color: Color(0xFFEFF4F7),
+          ),
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                "MESSAGE",
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                  color: Colors.black,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStateButton() {
+    switch (_requestState) {
+      case RequestState.ACCEPTED:
+        return _buildAccepted();
+      case RequestState.REQUESTED:
+        return _buildRequested();
+      case RequestState.PENDING:
+      default:
+        return _buildFollow();
+    }
+  }
+
   Widget _buildButtons() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Row(
         children: <Widget>[
-          Expanded(
-            child: InkWell(
-              onTap: () => print("followed"),
-              child: Container(
-                height: 40.0,
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  color: Color(0xFF404A5C),
-                ),
-                child: Center(
-                  child: Text(
-                    "FOLLOW",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          _buildStateButton(),
           SizedBox(width: 10.0),
-          Expanded(
-            child: InkWell(
-              onTap: () => print("Message"),
-              child: Container(
-                height: 40.0,
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  color: Color(0xFF404A5C),
-                ),
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(
-                      "MESSAGE",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          _buildMessage(),
         ],
       ),
     );
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      Friend friend = Friend(
+        receiver: _profileUser.id,
+        sender: _loggedUser.id,
+      );
+      FifaGenAPI().getFriendship(friend).then((friendRequest) {
+        setState(() {
+          switch (friendRequest.state) {
+            case "ACCEPTED":
+              _requestState = RequestState.ACCEPTED;
+              break;
+            case "PENDING":
+              _requestState = RequestState.PENDING;
+              break;
+            case "REQUESTED":
+              _requestState = RequestState.REQUESTED;
+              break;
+            default:
+              _requestState = RequestState.PENDING;
+          }
+        });
+      }).catchError((e) {
+        // TODO improve this error check
+        showDialog(
+            context: context, builder: (_) => AlertDialog(title: Text(e)));
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _loggedUser = ModalRoute.of(context).settings.arguments;
+    _argUsers = ModalRoute.of(context).settings.arguments;
+    _loggedUser = _argUsers[0];
+    _profileUser = _argUsers[1];
 
     Size screenSize = MediaQuery.of(context).size;
 
@@ -253,18 +326,12 @@ class UserProfileScreen extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      //SizedBox(height: screenSize.height / 6.4),
                       _buildProfileImage(),
                       SizedBox(height: 10.0),
                       _buildFullName(),
-                      //_buildStatus(context),
                       SizedBox(height: 30.0),
                       _buildStatContainer(),
-                      //_buildBio(context),
-                      // _buildSeparator(screenSize),
                       SizedBox(height: 10.0),
-                      //_buildGetInTouch(context),
-                      //SizedBox(height: 8.0),
                       _buildButtons(),
                     ],
                   ),

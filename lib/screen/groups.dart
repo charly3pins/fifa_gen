@@ -13,17 +13,30 @@ class _GroupsScreen extends State<GroupsScreen> {
   // Set initial mode to READ
   ViewMode _viewMode = ViewMode.READ;
 
-  User loggedUser;
+  User _loggedUser;
 
   final _groupsFormKey = GlobalKey<FormState>();
 
-  List<String> _users = <String>['', 'Carles', 'Gerard', 'Matheus', 'Hector', 'Abderra'];
+  List<String> _users = <String>[
+    '',
+    'Carles',
+    'Gerard',
+    'Matheus',
+    'Hector',
+    'Abderra'
+  ];
   String _user = '';
 
   @override
-  Widget build(BuildContext context) {
-    loggedUser = ModalRoute.of(context).settings.arguments;
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      _loggedUser = ModalRoute.of(context).settings.arguments;
+    });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
 
     switch (_viewMode) {
@@ -195,7 +208,4 @@ class _GroupsScreen extends State<GroupsScreen> {
           backgroundColor: Colors.amberAccent,
         ));
   }
-
-
-
 }

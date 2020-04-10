@@ -76,9 +76,15 @@ class _SearchState extends State<SearchListScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      _loggedUser = ModalRoute.of(context).settings.arguments;
+    });
+  }
+  
+  @override
   Widget build(BuildContext context) {
-    _loggedUser = ModalRoute.of(context).settings.arguments;
-
     return Scaffold(
         key: key,
         appBar: AppBar(
@@ -111,7 +117,8 @@ class _SearchState extends State<SearchListScreen> {
 
             return GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, "/userprofile", arguments: user);
+                  Navigator.pushNamed(context, "/userprofile",
+                      arguments: [_loggedUser, user]);
                 },
                 child: Card(
                     child: ListTile(

@@ -1,5 +1,4 @@
-import '../model/user.dart';
-
+import 'package:fifagen/model/user.dart';
 import 'package:flutter/material.dart';
 
 enum ViewMode { EDIT, READ }
