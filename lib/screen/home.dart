@@ -52,32 +52,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildNotificationsCounter() {
-    if (_notifications != null && _notifications > 0){
-    return Container(
-      width: 40,
-      height: 40,
-      alignment: Alignment.topRight,
-      margin: EdgeInsets.only(top: 5),
-      child: Container(
-        width: 15,
-        height: 15,
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xffc32c37),
-            border: Border.all(color: Colors.white, width: 1)),
-        child: Padding(
-          padding: const EdgeInsets.all(0.0),
-          child: Center(
-            child: Text(
-              _notifications.toString(),
-              style: TextStyle(fontSize: 10),
+    if (_notifications != null && _notifications > 0) {
+      return Container(
+        width: 40,
+        height: 40,
+        alignment: Alignment.topRight,
+        margin: EdgeInsets.only(top: 5),
+        child: Container(
+          width: 15,
+          height: 15,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xffc32c37),
+              border: Border.all(color: Colors.white, width: 1)),
+          child: Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: Center(
+              child: Text(
+                _notifications.toString(),
+                style: TextStyle(fontSize: 10),
+              ),
             ),
           ),
         ),
-      ),
-    );}
+      );
+    }
     return Container();
   }
+
   Widget _buildNotificationsIcon() {
     return Container(
       width: 40,
@@ -101,7 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     Future.delayed(Duration.zero, () {
       FifaGenAPI().getNotifications(_loggedUser.id).then((notifications) {
-        _notifications = notifications;
+        setState(() {
+          _notifications = notifications;
+        });
       }).catchError((e) {
         // TODO improve this error check
         showDialog(
