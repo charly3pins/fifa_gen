@@ -109,29 +109,31 @@ class _SearchState extends State<SearchListScreen> {
           itemBuilder: (BuildContext context, int index) {
             var user = _results[index];
 
-            return ListTile(
-              leading: IconButton(
-                icon: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/profile/" +
-                          (user.profilePicture != null &&
-                              user.profilePicture.isNotEmpty
-                              ? user.profilePicture
-                              : _genericAvatar)),
-                      fit: BoxFit.cover,
+            return GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, "/userprofile", arguments: user);
+                },
+                child: Card(
+                    child: ListTile(
+                  leading: IconButton(
+                    icon: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage("assets/profile/" +
+                              (user.profilePicture != null &&
+                                      user.profilePicture.isNotEmpty
+                                  ? user.profilePicture
+                                  : _genericAvatar)),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(100.0),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(100.0),
                   ),
-                ),
-              ),
-              title: Text(user.username),
-              subtitle: Text(user.name),
-              trailing: Icon(Icons.keyboard_arrow_right),
-              onTap: () {
-                Navigator.pushNamed(context, "/userprofile", arguments: user);
-              },
-            );
+                  title: Text(user.username),
+                  subtitle: Text(user.name),
+                  //trailing: Icon(Icons.keyboard_arrow_right),
+                )));
           });
     }
   }
