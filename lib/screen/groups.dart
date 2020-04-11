@@ -1,15 +1,14 @@
-import '../model/user.dart';
-
+import 'package:fifagen/model/user.dart';
 import 'package:flutter/material.dart';
 
 enum ViewMode { CREATE, EDIT, READ }
 
 class GroupsScreen extends StatefulWidget {
   @override
-  _GroupsScreen createState() => _GroupsScreen();
+  _GroupsState createState() => _GroupsState();
 }
 
-class _GroupsScreen extends State<GroupsScreen> {
+class _GroupsState extends State<GroupsScreen> {
   // Set initial mode to READ
   ViewMode _viewMode = ViewMode.READ;
 

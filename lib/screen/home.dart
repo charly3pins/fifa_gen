@@ -1,9 +1,10 @@
+import 'package:fifagen/model/friend.dart';
 import 'package:fifagen/model/user.dart';
 import 'package:fifagen/screen/groups.dart';
 import 'package:fifagen/service/fifa_gen_api.dart';
 import 'package:flutter/material.dart';
 
-import 'dart:convert';
+import 'notifications.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -12,8 +13,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   User _loggedUser;
-  final String _genericAvatar = "avatar-default.png";
-  int _notifications;
+  int _notificationsCounter;
+  List<User> _friendRequests;
 
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
@@ -52,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildNotificationsCounter() {
-    if (_notifications != null && _notifications > 0) {
+    if (_notificationsCounter != null && _notificationsCounter > 0) {
       return Container(
         width: 40,
         height: 40,
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(0.0),
             child: Center(
               child: Text(
-                _notifications.toString(),
+                _notificationsCounter.toString(),
                 style: TextStyle(fontSize: 10),
               ),
             ),
@@ -89,7 +90,11 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.notifications),
             tooltip: 'Notifications',
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, "/notifications",
+                  arguments: NotificationsScreenArguments(
+                      _loggedUser, _friendRequests));
+            },
             iconSize: 30,
           ),
           _buildNotificationsCounter(),
@@ -102,14 +107,16 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      FifaGenAPI().getNotifications(_loggedUser.id).then((notifications) {
+      FifaGenAPI().findNotifications(_loggedUser.id).then((notifications) {
         setState(() {
-          _notifications = notifications;
+          _notificationsCounter = notifications.friendRequests.length;
+          _friendRequests = notifications.friendRequests;
         });
       }).catchError((e) {
         // TODO improve this error check
         showDialog(
-            context: context, builder: (_) => AlertDialog(title: Text(e)));
+            context: context,
+            builder: (_) => AlertDialog(title: Text(e.toString())));
       });
     });
   }
@@ -138,11 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage("assets/profile/" +
-                        (_loggedUser.profilePicture != null &&
-                                _loggedUser.profilePicture.isNotEmpty
-                            ? _loggedUser.profilePicture
-                            : _genericAvatar)),
+                    image: AssetImage(
+                        "assets/profile/" + _loggedUser.profilePicture),
                     fit: BoxFit.cover,
                   ),
                   borderRadius: BorderRadius.circular(80.0),

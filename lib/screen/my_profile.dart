@@ -5,16 +5,16 @@ enum ViewMode { EDIT, READ }
 
 class MyProfileScreen extends StatefulWidget {
   @override
-  _MyProfileScreen createState() => _MyProfileScreen();
+  _MyProfileState createState() => _MyProfileState();
 }
 
-class _MyProfileScreen extends State<MyProfileScreen> {
+class _MyProfileState extends State<MyProfileScreen> {
   // Set initial mode to READ
   ViewMode _viewMode = ViewMode.READ;
 
   User _loggedUser;
   User _editUser;
-  final String _genericAvatar = "avatar-default.png";
+
   final String _friends = "16";
   final String _scores = "450";
 
@@ -39,11 +39,7 @@ class _MyProfileScreen extends State<MyProfileScreen> {
         height: 140.0,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/profile/" +
-                (_loggedUser.profilePicture != null &&
-                        _loggedUser.profilePicture.isNotEmpty
-                    ? _loggedUser.profilePicture
-                    : _genericAvatar)),
+            image: AssetImage("assets/profile/" + _loggedUser.profilePicture),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(80.0),

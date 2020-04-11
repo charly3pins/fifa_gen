@@ -3,7 +3,7 @@ import 'package:fifagen/model/user.dart';
 import 'package:fifagen/service/fifa_gen_api.dart';
 import 'package:flutter/material.dart';
 
-enum RequestState { ACCEPTED, PENDING, REQUESTED }
+enum RequestState { ACCEPTED, REQUESTED }
 
 class UserProfileScreen extends StatefulWidget {
   @override
@@ -15,8 +15,6 @@ class _UserProfileScreen extends State<UserProfileScreen> {
   User _loggedUser;
   User _profileUser;
   RequestState _requestState;
-
-  final String _genericAvatar = "avatar-default.png";
 
   final String _friends = "16";
   final String _scores = "450";
@@ -40,11 +38,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
         height: 140.0,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/profile/" +
-                (_profileUser.profilePicture != null &&
-                        _profileUser.profilePicture.isNotEmpty
-                    ? _profileUser.profilePicture
-                    : _genericAvatar)),
+            image: AssetImage("assets/profile/" + _profileUser.profilePicture),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(80.0),
@@ -112,7 +106,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
     );
   }
 
-  // TODO add option for UNFOLLOW
+  // TODO add option for remove
   Widget _buildAccepted() {
     return Expanded(
       child: InkWell(
@@ -138,101 +132,92 @@ class _UserProfileScreen extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildFollow() {
-    return Expanded(
-      child: InkWell(
-        onTap: () {
-          Friend friend = Friend(
-              id: "",
-              receiver: _profileUser.id,
-              sender: _loggedUser.id,
-              state: "REQUESTED");
-          FifaGenAPI().sendFriendRequest(friend).then((friendRequest) {
-            setState(() {
-              _requestState = RequestState.REQUESTED;
-              showDialog(
-                  context: context,
-                  builder: (_) =>
-                      // TODO improve
-                      AlertDialog(title: Text("Friend request sent.")));
-            });
-          }).catchError((e) {
-            // TODO improve this error check
-            showDialog(
-                context: context, builder: (_) => AlertDialog(title: Text(e)));
-          });
-        },
-        child: Container(
-          height: 40.0,
-          decoration: BoxDecoration(
-            border: Border.all(),
-            color: Color(0xFF404A5C),
-          ),
-          child: Center(
-            child: Text(
-              "FOLLOW",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
+  Widget _buildAddFriend() {
+    return FlatButton(
+      color: Color(0xFF4B9DFE),
+      textColor: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.person_add),
+          SizedBox(width: 5),
+          Text(
+            "Add friend",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
             ),
-          ),
-        ),
+          )
+        ],
       ),
+      padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      onPressed: () {
+        Friend friend = Friend(
+            id: "",
+            receiver: _profileUser.id,
+            sender: _loggedUser.id,
+            state: "REQUESTED");
+        FifaGenAPI().sendFriendRequest(friend).then((friendRequest) {
+          setState(() {
+            _requestState = RequestState.REQUESTED;
+            showDialog(
+                context: context,
+                builder: (_) =>
+                    // TODO improve
+                    AlertDialog(title: Text("Friend request sent.")));
+          });
+        }).catchError((e) {
+          // TODO improve this error check
+          showDialog(
+              context: context, builder: (_) => AlertDialog(title: Text(e)));
+        });
+      },
     );
   }
 
   Widget _buildRequested() {
-    return Expanded(
-      child: InkWell(
-        child: Container(
-          height: 40.0,
-          decoration: BoxDecoration(
-            border: Border.all(),
-            color: Color(0xFFEFF4F7),
-          ),
-          child: Center(
-            child: Text(
-              "REQUESTED...",
-              style: TextStyle(
-                fontFamily: 'Roboto',
-                color: Colors.black,
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
+    return FlatButton(
+      color: Colors.white,
+      textColor: Colors.black,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.person),
+          SizedBox(width: 5),
+          Text(
+            "Request sent",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
             ),
-          ),
-        ),
+          )
+        ],
       ),
+      padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      onPressed: () {},
     );
   }
 
   Widget _buildMessage() {
-    return Expanded(
-      child: InkWell(
-        onTap: () => print("Message"),
-        child: Container(
-          height: 40.0,
-          decoration: BoxDecoration(
-            border: Border.all(),
-            color: Color(0xFFEFF4F7),
-          ),
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                "MESSAGE",
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  color: Colors.black,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+    return FlatButton(
+      color: Colors.white,
+      textColor: Colors.black,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.message),
+          SizedBox(width: 5),
+          Text(
+            "Message",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
             ),
-          ),
-        ),
+          )
+        ],
       ),
+      padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      onPressed: () {},
     );
   }
 
@@ -242,22 +227,20 @@ class _UserProfileScreen extends State<UserProfileScreen> {
         return _buildAccepted();
       case RequestState.REQUESTED:
         return _buildRequested();
-      case RequestState.PENDING:
       default:
-        return _buildFollow();
+        return _buildAddFriend();
     }
   }
 
   Widget _buildButtons() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Row(
-        children: <Widget>[
-          _buildStateButton(),
-          SizedBox(width: 10.0),
-          _buildMessage(),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        _buildStateButton(),
+        SizedBox(width: 10.0),
+        _buildMessage(), // TODO hide if no friends
+      ],
     );
   }
 
@@ -275,14 +258,11 @@ class _UserProfileScreen extends State<UserProfileScreen> {
             case "ACCEPTED":
               _requestState = RequestState.ACCEPTED;
               break;
-            case "PENDING":
-              _requestState = RequestState.PENDING;
-              break;
             case "REQUESTED":
               _requestState = RequestState.REQUESTED;
               break;
             default:
-              _requestState = RequestState.PENDING;
+              _requestState = null;
           }
         });
       }).catchError((e) {
@@ -330,9 +310,9 @@ class _UserProfileScreen extends State<UserProfileScreen> {
                       SizedBox(height: 10.0),
                       _buildFullName(),
                       SizedBox(height: 30.0),
-                      _buildStatContainer(),
-                      SizedBox(height: 10.0),
                       _buildButtons(),
+                      SizedBox(height: 10.0),
+                      _buildStatContainer(),
                     ],
                   ),
                 ),

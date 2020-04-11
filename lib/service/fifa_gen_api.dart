@@ -1,6 +1,6 @@
 import 'package:fifagen/model/friend.dart';
-
-import '../model/user.dart';
+import 'package:fifagen/model/user.dart';
+import 'package:fifagen/model/notifications.dart';
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -83,13 +83,13 @@ class FifaGenAPI {
     return Future.error(response.body);
   }
 
-  Future<int> getNotifications(String id) async {
+  Future<Notifications> findNotifications(String id) async {
     final response = await http.get(baseURL + "/notifications" + "?id=" + id,
         headers: {"Content-Type": 'application/json'});
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      return jsonData;
+      return Notifications.fromJSON(jsonData);
     }
 
     return Future.error(response.body);

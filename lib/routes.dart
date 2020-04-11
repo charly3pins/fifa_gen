@@ -1,3 +1,4 @@
+import 'package:fifagen/screen/notifications.dart';
 import 'package:fifagen/screen/search_list.dart';
 import 'package:flutter/widgets.dart';
 
@@ -12,4 +13,5 @@ final Map<String, WidgetBuilder> routes = <String, WidgetBuilder>{
   "/myprofile": (BuildContext context) => MyProfileScreen(),
   "/search": (BuildContext context) => SearchListScreen(),
   "/userprofile": (BuildContext context) => UserProfileScreen(),
+  "/notifications": (BuildContext context) => NotificationsScreen(),
 };

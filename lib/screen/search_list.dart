@@ -13,7 +13,6 @@ class SearchListScreen extends StatefulWidget {
 
 class _SearchState extends State<SearchListScreen> {
   User _loggedUser;
-  final String _genericAvatar = "avatar-default.png";
 
   final FocusNode myFocusNode = new FocusNode();
 
@@ -82,7 +81,7 @@ class _SearchState extends State<SearchListScreen> {
       _loggedUser = ModalRoute.of(context).settings.arguments;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,24 +121,22 @@ class _SearchState extends State<SearchListScreen> {
                 },
                 child: Card(
                     child: ListTile(
-                  leading: IconButton(
-                    icon: Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage("assets/profile/" +
-                              (user.profilePicture != null &&
-                                      user.profilePicture.isNotEmpty
-                                  ? user.profilePicture
-                                  : _genericAvatar)),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(100.0),
+                  leading: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image:
+                            AssetImage("assets/profile/" + user.profilePicture),
                       ),
+                      borderRadius: BorderRadius.circular(100.0),
                     ),
                   ),
-                  title: Text(user.username),
+                  title: Text(
+                    user.username,
+                    style: TextStyle(fontSize: 20),
+                  ),
                   subtitle: Text(user.name),
-                  //trailing: Icon(Icons.keyboard_arrow_right),
                 )));
           });
     }
