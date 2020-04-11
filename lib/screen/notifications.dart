@@ -45,7 +45,10 @@ class _NotificationsState extends State<NotificationsScreen> {
             itemBuilder: (BuildContext context, int index) {
               var user = _friendRequests[index];
               return GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, "/userprofile",
+                        arguments: [_loggedUser, user]);
+                  },
                   child: Card(
                       child: ListTile(
                     leading: Container(

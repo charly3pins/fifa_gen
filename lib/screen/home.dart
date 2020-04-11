@@ -1,4 +1,4 @@
-import 'package:fifagen/model/friend.dart';
+import 'package:fifagen/model/friendship.dart';
 import 'package:fifagen/model/user.dart';
 import 'package:fifagen/screen/groups.dart';
 import 'package:fifagen/service/fifa_gen_api.dart';

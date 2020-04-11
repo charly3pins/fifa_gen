@@ -56,7 +56,7 @@ class _MyProfileState extends State<MyProfileScreen> {
     );
 
     return Text(
-      _loggedUser.name + " (" + _loggedUser.username + ")",
+      _loggedUser.name,
       style: _nameTextStyle,
     );
   }
@@ -153,7 +153,6 @@ class _MyProfileState extends State<MyProfileScreen> {
                   onPressed: () {
                     final form = _myProfileFormKey.currentState;
                     if (form.validate()) {
-                      print(_editUser);
                       form.save();
                     }
                   },
@@ -242,6 +241,7 @@ class _MyProfileState extends State<MyProfileScreen> {
           backgroundColor: Colors.transparent,
           appBar: new AppBar(
             backgroundColor: Colors.transparent,
+            title: Text(_loggedUser.username),
             actions: <Widget>[
               IconButton(
                 icon: Icon(

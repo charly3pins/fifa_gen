@@ -1,4 +1,4 @@
-import 'package:fifagen/model/friend.dart';
+import 'package:fifagen/model/friendship.dart';
 import 'package:fifagen/model/user.dart';
 import 'package:fifagen/model/notifications.dart';
 
@@ -52,32 +52,35 @@ class FifaGenAPI {
     return Future.error(response.body);
   }
 
-  Future<Friend> sendFriendRequest(Friend friend) async {
+  Future<Friendship> createFriendRequest(Friendship friend) async {
     String jsonBody = json.encode(friend.toJSON());
-    final response = await http.post(baseURL + "/friends",
+    final response = await http.post(baseURL + "/friendship",
         headers: {"Content-Type": 'application/json'}, body: jsonBody);
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      return Friend.fromJSON(jsonData);
+      return Friendship.fromJSON(jsonData);
     }
 
     return Future.error(response.body);
   }
 
-  Future<Friend> getFriendship(Friend friend) async {
+  Future<Friendship> getFriendship(Friendship friend) async {
     final response = await http.get(
         baseURL +
-            "/friends" +
-            "?sender=" +
-            friend.sender +
-            "&receiver=" +
-            friend.receiver,
+            "/friendship" +
+            "?userOne=" +
+            friend.userOneID +
+            "&userTwo=" +
+            friend.userTwoID,
         headers: {"Content-Type": 'application/json'});
 
     if (response.statusCode == 200) {
+      if (response.body.isEmpty) {
+        return null;
+      }
       final jsonData = json.decode(response.body);
-      return Friend.fromJSON(jsonData);
+      return Friendship.fromJSON(jsonData);
     }
 
     return Future.error(response.body);

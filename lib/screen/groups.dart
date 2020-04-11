@@ -138,7 +138,6 @@ class _GroupsState extends State<GroupsScreen> {
                             onPressed: () {
                               final form = _groupsFormKey.currentState;
                               if (form.validate()) {
-                                print(_user);
                                 form.save();
 
                                 /*FifaGenAPI().createUser(_user).then((usr) {

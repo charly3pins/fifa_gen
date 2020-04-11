@@ -1,9 +1,17 @@
-import 'package:fifagen/model/friend.dart';
+import 'package:fifagen/model/friendship.dart';
 import 'package:fifagen/model/user.dart';
 import 'package:fifagen/service/fifa_gen_api.dart';
 import 'package:flutter/material.dart';
 
-enum RequestState { ACCEPTED, REQUESTED }
+/*
+const (
+	StatusCodePending  = 0
+	StatusCodeAccepted = 1
+	StatusCodeDecline  = 2
+	StatusCodeBlocked  = 3
+)
+ */
+enum RequestState { ACCEPTED, PENDING, DECLINED, BLOCKED }
 
 class UserProfileScreen extends StatefulWidget {
   @override
@@ -15,6 +23,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
   User _loggedUser;
   User _profileUser;
   RequestState _requestState;
+  Friendship _friendship;
 
   final String _friends = "16";
   final String _scores = "450";
@@ -55,7 +64,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
     );
 
     return Text(
-      _profileUser.name + " (" + _profileUser.username + ")",
+      _profileUser.name,
       style: _nameTextStyle,
     );
   }
@@ -118,7 +127,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
           ),
           child: Center(
             child: Text(
-              "FOLLOWING",
+              "Friends",
               style: TextStyle(
                 fontFamily: 'Roboto',
                 color: Colors.black,
@@ -129,6 +138,26 @@ class _UserProfileScreen extends State<UserProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildRequested() {
+    return Container(
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.person),
+          SizedBox(width: 5),
+          Text(
+            "Request sent",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+            ),
+          )
+        ],
+      ),
+      padding: EdgeInsets.only(left: 20, right: 20, top: 7, bottom: 7),
     );
   }
 
@@ -149,22 +178,18 @@ class _UserProfileScreen extends State<UserProfileScreen> {
           )
         ],
       ),
-      padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
+      padding: EdgeInsets.only(left: 20, right: 20, top: 7, bottom: 7),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       onPressed: () {
-        Friend friend = Friend(
-            id: "",
-            receiver: _profileUser.id,
-            sender: _loggedUser.id,
-            state: "REQUESTED");
-        FifaGenAPI().sendFriendRequest(friend).then((friendRequest) {
+        Friendship friendship = Friendship(
+            userOneID: _loggedUser.id,
+            userTwoID: _profileUser.id,
+            status: 0, // Status PENDING
+            actionUserID: _loggedUser.id);
+        FifaGenAPI().createFriendRequest(friendship).then((friendRequest) {
           setState(() {
-            _requestState = RequestState.REQUESTED;
-            showDialog(
-                context: context,
-                builder: (_) =>
-                    // TODO improve
-                    AlertDialog(title: Text("Friend request sent.")));
+            _requestState = RequestState.PENDING;
+            _friendship = friendRequest;
           });
         }).catchError((e) {
           // TODO improve this error check
@@ -175,49 +200,35 @@ class _UserProfileScreen extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildRequested() {
-    return FlatButton(
-      color: Colors.white,
-      textColor: Colors.black,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(Icons.person),
-          SizedBox(width: 5),
-          Text(
-            "Request sent",
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-            ),
-          )
-        ],
-      ),
-      padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      onPressed: () {},
-    );
-  }
-
-  Widget _buildMessage() {
-    return FlatButton(
-      color: Colors.white,
-      textColor: Colors.black,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(Icons.message),
-          SizedBox(width: 5),
-          Text(
-            "Message",
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-            ),
-          )
-        ],
-      ),
-      padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      onPressed: () {},
+  Widget _buildAnswerRequestButtons() {
+    return Row(
+      children: <Widget>[
+        FlatButton(
+          child: Text("Confirm",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+              )),
+          color: Color(0xFF4B9DFE),
+          textColor: Colors.white,
+          padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+          onPressed: () {},
+        ),
+        SizedBox(width: 10.0),
+        FlatButton(
+          child: Text("Delete",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+              )),
+          color: Colors.white,
+          textColor: Colors.black,
+          padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
+          shape: RoundedRectangleBorder(
+              side: BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.circular(5)),
+          onPressed: () {},
+        ),
+      ],
     );
   }
 
@@ -225,8 +236,12 @@ class _UserProfileScreen extends State<UserProfileScreen> {
     switch (_requestState) {
       case RequestState.ACCEPTED:
         return _buildAccepted();
-      case RequestState.REQUESTED:
+      case RequestState.PENDING:
+        if (_friendship.actionUserID != _loggedUser.id) {
+          return _buildAnswerRequestButtons();
+        }
         return _buildRequested();
+      // TODO add DECLINED and BLOCKED
       default:
         return _buildAddFriend();
     }
@@ -238,8 +253,6 @@ class _UserProfileScreen extends State<UserProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         _buildStateButton(),
-        SizedBox(width: 10.0),
-        _buildMessage(), // TODO hide if no friends
       ],
     );
   }
@@ -248,27 +261,40 @@ class _UserProfileScreen extends State<UserProfileScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      Friend friend = Friend(
-        receiver: _profileUser.id,
-        sender: _loggedUser.id,
+      Friendship friendship = Friendship(
+        userOneID: _loggedUser.id,
+        userTwoID: _profileUser.id,
       );
-      FifaGenAPI().getFriendship(friend).then((friendRequest) {
+      FifaGenAPI().getFriendship(friendship).then((friendRequest) {
         setState(() {
-          switch (friendRequest.state) {
-            case "ACCEPTED":
-              _requestState = RequestState.ACCEPTED;
-              break;
-            case "REQUESTED":
-              _requestState = RequestState.REQUESTED;
-              break;
-            default:
-              _requestState = null;
+          if (friendRequest == null) {
+            _requestState = null;
+            _friendship = null;
+          } else {
+            switch (friendRequest.status) {
+              case 0:
+                _requestState = RequestState.PENDING;
+                break;
+              case 1:
+                _requestState = RequestState.ACCEPTED;
+                break;
+              case 2:
+                _requestState = RequestState.DECLINED;
+                break;
+              case 3:
+                _requestState = RequestState.BLOCKED;
+                break;
+              default:
+                _requestState = null;
+            }
+            _friendship = friendRequest;
           }
         });
       }).catchError((e) {
         // TODO improve this error check
         showDialog(
-            context: context, builder: (_) => AlertDialog(title: Text(e)));
+            context: context,
+            builder: (_) => AlertDialog(title: Text(e.toString())));
       });
     });
   }
@@ -298,6 +324,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
           backgroundColor: Colors.transparent,
           appBar: new AppBar(
             backgroundColor: Colors.transparent,
+            title: Text(_profileUser.username),
           ),
           body: Stack(
             children: <Widget>[

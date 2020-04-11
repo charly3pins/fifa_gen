@@ -12,15 +12,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginPageScreen extends State<LoginScreen> {
-  // To adjust the layout according to the screen size
-  // so that our layout remains responsive ,we need to
-  // calculate the screen height
   double screenHeight;
 
   final _loginFormKey = GlobalKey<FormState>();
   final _signUpFormKey = GlobalKey<FormState>();
 
   final _user = User();
+  final String _genericAvatar = "avatar-default.png";
 
   // Set initial mode to login
   AuthMode _authMode = AuthMode.LOGIN;
@@ -303,17 +301,18 @@ class _LoginPageScreen extends State<LoginScreen> {
                             final form = _signUpFormKey.currentState;
                             if (form.validate()) {
                               form.save();
+                              _user.profilePicture = _genericAvatar;
                               FifaGenAPI().createUser(_user).then((usr) {
                                 // Navigate to new page without back
                                 // TODO Navigator.pushNamedReplacement(context,
-                                Navigator.pushNamed(context, "/myprofile",
+                                Navigator.pushNamed(context, "/home",
                                     arguments: usr);
                               }).catchError((e) {
                                 // TODO improve this error check
                                 showDialog(
                                     context: context,
                                     builder: (_) =>
-                                        AlertDialog(title: Text(e)));
+                                        AlertDialog(title: Text(e.toString())));
                               });
                             }
                           },
