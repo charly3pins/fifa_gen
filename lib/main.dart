@@ -1,19 +1,22 @@
-import 'package:fifagen/routes.dart';
-import 'package:fifagen/screen/user_profile.dart';
-
+import 'package:fifagen/notifiers/auth_api.dart';
+import 'package:fifagen/widgets/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'model/user.dart';
+void main() => runApp(FifaGenApp());
 
-void main() => runApp(FifaGen());
-
-class FifaGen extends StatelessWidget {
+class FifaGenApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: "/login",
-      routes: routes,
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => AuthNotifier(),
+          ),
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: AuthWidget(),
+        ));
   }
 }
