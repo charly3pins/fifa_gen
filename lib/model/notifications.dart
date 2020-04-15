@@ -8,7 +8,6 @@ class Notifications {
   factory Notifications.fromJSON(Map<String, dynamic> parsedJson) {
     List<User> users = [];
     for (var i = 0; i < parsedJson["friendRequests"].length; i++) {
-      print(parsedJson["friendRequests"][i]);
       users.add(User.fromJSON(parsedJson["friendRequests"][i]));
     }
     return Notifications(

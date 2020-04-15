@@ -12,6 +12,7 @@ final Map<String, WidgetBuilder> routes = <String, WidgetBuilder>{
   "/home": (BuildContext context) => HomeScreen(),
   "/myprofile": (BuildContext context) => MyProfileScreen(),
   "/search": (BuildContext context) => SearchListScreen(),
-  "/userprofile": (BuildContext context) => UserProfileScreen(),
+  "/userprofile": (BuildContext context) => UserProfileScreen(
+      parentAction: NotificationsScreen().updateFriendRequests),
   "/notifications": (BuildContext context) => NotificationsScreen(),
 };

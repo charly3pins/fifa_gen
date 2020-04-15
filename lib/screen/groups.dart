@@ -36,8 +36,6 @@ class _GroupsState extends State<GroupsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Size screenSize = MediaQuery.of(context).size;
-
     switch (_viewMode) {
       case ViewMode.CREATE:
         return create(context);

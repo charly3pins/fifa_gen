@@ -86,6 +86,18 @@ class FifaGenAPI {
     return Future.error(response.body);
   }
 
+  Future answerFriendRequest(Friendship friend) async {
+    String jsonBody = json.encode(friend.toJSON());
+    final response = await http.put(baseURL + "/friendship",
+        headers: {"Content-Type": 'application/json'}, body: jsonBody);
+
+    if (response.statusCode == 200) {
+      return null;
+    }
+
+    return Future.error(response.body);
+  }
+
   Future<Notifications> findNotifications(String id) async {
     final response = await http.get(baseURL + "/notifications" + "?id=" + id,
         headers: {"Content-Type": 'application/json'});

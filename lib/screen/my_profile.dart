@@ -120,7 +120,6 @@ class _MyProfileState extends State<MyProfileScreen> {
   }
 
   Widget edit(BuildContext context) {
-    Size screenSize = MediaQuery.of(context).size;
     return Stack(
       children: <Widget>[
         Container(

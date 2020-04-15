@@ -3,17 +3,13 @@ import 'package:fifagen/model/user.dart';
 import 'package:fifagen/service/fifa_gen_api.dart';
 import 'package:flutter/material.dart';
 
-/*
-const (
-	StatusCodePending  = 0
-	StatusCodeAccepted = 1
-	StatusCodeDecline  = 2
-	StatusCodeBlocked  = 3
-)
- */
 enum RequestState { ACCEPTED, PENDING, DECLINED, BLOCKED }
 
 class UserProfileScreen extends StatefulWidget {
+  final void Function(Friendship f) parentAction;
+
+  const UserProfileScreen({Key key, this.parentAction}) : super(key: key);
+
   @override
   _UserProfileScreen createState() => _UserProfileScreen();
 }
@@ -21,7 +17,7 @@ class UserProfileScreen extends StatefulWidget {
 class _UserProfileScreen extends State<UserProfileScreen> {
   List<User> _argUsers;
   User _loggedUser;
-  User _profileUser;
+  User _visitedUserProfile;
   RequestState _requestState;
   Friendship _friendship;
 
@@ -47,7 +43,8 @@ class _UserProfileScreen extends State<UserProfileScreen> {
         height: 140.0,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/profile/" + _profileUser.profilePicture),
+            image: AssetImage(
+                "assets/profile/" + _visitedUserProfile.profilePicture),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(80.0),
@@ -64,7 +61,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
     );
 
     return Text(
-      _profileUser.name,
+      _visitedUserProfile.name,
       style: _nameTextStyle,
     );
   }
@@ -117,27 +114,22 @@ class _UserProfileScreen extends State<UserProfileScreen> {
 
   // TODO add option for remove
   Widget _buildAccepted() {
-    return Expanded(
-      child: InkWell(
-        child: Container(
-          height: 40.0,
-          decoration: BoxDecoration(
-            border: Border.all(),
-            color: Color(0xFFEFF4F7),
-          ),
-          child: Center(
-            child: Text(
-              "Friends",
-              style: TextStyle(
-                fontFamily: 'Roboto',
-                color: Colors.black,
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
+    return Container(
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.person),
+          SizedBox(width: 5),
+          Text(
+            "Friends",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
             ),
-          ),
-        ),
+          )
+        ],
       ),
+      padding: EdgeInsets.only(left: 20, right: 20, top: 7, bottom: 7),
     );
   }
 
@@ -183,8 +175,8 @@ class _UserProfileScreen extends State<UserProfileScreen> {
       onPressed: () {
         Friendship friendship = Friendship(
             userOneID: _loggedUser.id,
-            userTwoID: _profileUser.id,
-            status: 0, // Status PENDING
+            userTwoID: _visitedUserProfile.id,
+            status: FriendshipStatus.Pending,
             actionUserID: _loggedUser.id);
         FifaGenAPI().createFriendRequest(friendship).then((friendRequest) {
           setState(() {
@@ -212,7 +204,28 @@ class _UserProfileScreen extends State<UserProfileScreen> {
           textColor: Colors.white,
           padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          onPressed: () {},
+          onPressed: () {
+            // The pending requests will be from the _visitedUserProfile.id,
+            // so the _loggedUser will be the userTwo always
+            Friendship friendship = Friendship(
+                userOneID: _visitedUserProfile.id,
+                userTwoID: _loggedUser.id,
+                status: FriendshipStatus.Accepted,
+                actionUserID: _loggedUser.id);
+            FifaGenAPI().answerFriendRequest(friendship).then((resp) {
+              friendship.actionUserID = _visitedUserProfile.id;
+              friendship.status = FriendshipStatus.Pending;
+              widget.parentAction(friendship);
+              setState(() {
+                _requestState = RequestState.ACCEPTED;
+              });
+            }).catchError((e) {
+              // TODO improve this error check
+              showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(title: Text(e.toString())));
+            });
+          },
         ),
         SizedBox(width: 10.0),
         FlatButton(
@@ -263,7 +276,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
     Future.delayed(Duration.zero, () {
       Friendship friendship = Friendship(
         userOneID: _loggedUser.id,
-        userTwoID: _profileUser.id,
+        userTwoID: _visitedUserProfile.id,
       );
       FifaGenAPI().getFriendship(friendship).then((friendRequest) {
         setState(() {
@@ -272,16 +285,16 @@ class _UserProfileScreen extends State<UserProfileScreen> {
             _friendship = null;
           } else {
             switch (friendRequest.status) {
-              case 0:
+              case FriendshipStatus.Pending:
                 _requestState = RequestState.PENDING;
                 break;
-              case 1:
+              case FriendshipStatus.Accepted:
                 _requestState = RequestState.ACCEPTED;
                 break;
-              case 2:
+              case FriendshipStatus.Declined:
                 _requestState = RequestState.DECLINED;
                 break;
-              case 3:
+              case FriendshipStatus.Blocked:
                 _requestState = RequestState.BLOCKED;
                 break;
               default:
@@ -303,7 +316,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     _argUsers = ModalRoute.of(context).settings.arguments;
     _loggedUser = _argUsers[0];
-    _profileUser = _argUsers[1];
+    _visitedUserProfile = _argUsers[1];
 
     Size screenSize = MediaQuery.of(context).size;
 
@@ -324,7 +337,7 @@ class _UserProfileScreen extends State<UserProfileScreen> {
           backgroundColor: Colors.transparent,
           appBar: new AppBar(
             backgroundColor: Colors.transparent,
-            title: Text(_profileUser.username),
+            title: Text(_visitedUserProfile.username),
           ),
           body: Stack(
             children: <Widget>[
