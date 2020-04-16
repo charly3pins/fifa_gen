@@ -42,6 +42,7 @@ class _MyProfileState extends State<MyProfileScreen> {
     if (_viewMode == ViewMode.EDIT) {
       return _buildEdit(context, _user, _authNotif);
     } else {
+      _authNotif.clearError();
       return _buildRead(context, _user);
     }
   }

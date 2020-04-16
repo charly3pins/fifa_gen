@@ -27,7 +27,10 @@ class AuthNotifier with ChangeNotifier {
   /*
   SETTER
   */
-  void set(String error) => _error = error;
+  void set(String error) {
+     _error = error;
+     notifyListeners();
+  }
 
   /*
   GETTERS
