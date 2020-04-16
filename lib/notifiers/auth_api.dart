@@ -28,8 +28,8 @@ class AuthNotifier with ChangeNotifier {
   SETTER
   */
   void set(String error) {
-     _error = error;
-     notifyListeners();
+    _error = error;
+    notifyListeners();
   }
 
   /*
@@ -80,16 +80,32 @@ class AuthNotifier with ChangeNotifier {
     notifyListeners();
   }
 
+  /* We receive the user from the FORM with the variables editable changed,
+    so we copy the remaining from the _user and if the requests is successfull,
+    we update the _user with the edited user ones
+  */
   Future<void> updateUser(User user) async {
+    // TODO check how to improve this code
+    // Only variables that are not editable
+    user.id = _user.id;
+    user.username = _user.username;
+    user.password = _user.password;
+
     String jsonBody = json.encode(user.toJson());
     final response = await http.put(_baseUrl + "/users/${user.id}",
         headers: {"Content-Type": 'application/json'}, body: jsonBody);
 
     if (_error == null && response.statusCode == 200 && response.body.isEmpty) {
+      // TODO check how to improve this code
+      // Only variables that are editable
+      _user.name = user.name;
+      //_user.profilePicture = user.profilePicture; // TODO uncomment when picture is editable
+
       clearError();
     } else {
       _error = ErrorUpdateUserProfile;
     }
+
     notifyListeners();
   }
 }

@@ -67,8 +67,7 @@ class _MyProfileState extends State<MyProfileScreen> {
                 if (form.validate()) {
                   authNotif.clearError();
                   form.save();
-                  authNotif.updateUser(user).then((_) {
-                    user.name = _editUser.name;
+                  authNotif.updateUser(_editUser).then((_) {
                     setState(() {
                       _viewMode = ViewMode.READ;
                     });
