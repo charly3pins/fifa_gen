@@ -1,6 +1,7 @@
 import 'package:fifagen/models/user.dart';
 import 'package:fifagen/notifiers/auth_api.dart';
 import 'package:fifagen/screens/my_profile.dart';
+import 'package:fifagen/screens/search_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,8 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authNotif = Provider.of<AuthNotifier>(context);
-    final User _user = authNotif.user;
+    final _authNotif = Provider.of<AuthNotifier>(context);
+    final User _user = _authNotif.user;
 
     return Scaffold(
       appBar: AppBar(
@@ -55,10 +56,18 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {},
           ),
           IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: 'Search',
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => SearchListScreen()));
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.exit_to_app),
             tooltip: 'Log out',
             onPressed: () {
-              authNotif.logout(_user);
+              _authNotif.logout(_user);
             },
             iconSize: 30,
           ),
