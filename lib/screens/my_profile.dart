@@ -1,5 +1,7 @@
 import 'package:fifagen/models/user.dart';
 import 'package:fifagen/notifiers/auth_api.dart';
+import 'package:fifagen/notifiers/errors.dart';
+import 'package:fifagen/widgets/snack_bar_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -34,69 +36,85 @@ class _MyProfileState extends State<MyProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authNotif = Provider.of<AuthNotifier>(context);
-    final User _user = authNotif.user;
+    final _authNotif = Provider.of<AuthNotifier>(context);
+    final User _user = _authNotif.user;
 
     if (_viewMode == ViewMode.EDIT) {
-      return _buildEdit(context, _user);
+      return _buildEdit(context, _user, _authNotif);
     } else {
       return _buildRead(context, _user);
     }
   }
 
-  Widget _buildEdit(BuildContext context, User user) {
+  Widget _buildEdit(BuildContext context, User user, AuthNotifier authNotif) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Edit profile"),
-        leading: IconButton(
-          icon: Icon(Icons.clear),
-          onPressed: () {
-            setState(() {
-              _viewMode = ViewMode.READ;
-            });
-          },
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.check),
+        appBar: AppBar(
+          title: Text("Edit profile"),
+          leading: IconButton(
+            icon: Icon(Icons.clear),
             onPressed: () {
-              final form = _formKey.currentState;
-              if (form.validate()) {
-                form.save();
-                // TODO USER NOTIFIER ?
-              }
+              setState(() {
+                _viewMode = ViewMode.READ;
+              });
             },
-          )
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            FlatButton(
-              onPressed: () {},
-              textColor: Colors.black,
-              child: _buildProfileImage(user),
-            ),
-            SizedBox(height: 15),
-            TextFormField(
-              decoration: InputDecoration(
-                  labelText: "Name", hasFloatingPlaceholder: true),
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter your Name.';
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: () {
+                final form = _formKey.currentState;
+                if (form.validate()) {
+                  authNotif.clearError();
+                  form.save();
+                  authNotif.updateUser(user).then((_) {
+                    user.name = _editUser.name;
+                    setState(() {
+                      _viewMode = ViewMode.READ;
+                    });
+                  }).catchError((_) {
+                    authNotif.set(ErrorUpdateUserProfile);
+                  });
                 }
-                return null;
               },
-              initialValue: user.name,
-              onSaved: (val) => setState(() => _editUser.name = val.trim()),
-            ),
-            SizedBox(height: 15),
+            )
           ],
         ),
-      ),
-    );
+        body: Column(
+          children: <Widget>[
+            Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  FlatButton(
+                    onPressed: () {},
+                    textColor: Colors.black,
+                    child: _buildProfileImage(user),
+                  ),
+                  SizedBox(height: 15),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        labelText: "Name", hasFloatingPlaceholder: true),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter your Name.';
+                      }
+                      return null;
+                    },
+                    initialValue: user.name,
+                    onSaved: (val) =>
+                        setState(() => _editUser.name = val.trim()),
+                  ),
+                  SizedBox(height: 15),
+                ],
+              ),
+            ),
+            Consumer<AuthNotifier>(
+              builder: (context, authNotif, child) =>
+                  SnackBarLauncher(error: authNotif.error),
+            ),
+          ],
+        ));
   }
 
   Widget _buildRead(BuildContext context, User user) {

@@ -1,5 +1,6 @@
 import 'package:fifagen/models/user.dart';
 import 'package:fifagen/notifiers/auth_api.dart';
+import 'package:fifagen/widgets/snack_bar_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   AuthMode _authMode = AuthMode.LOGIN;
 
   final _formKey = GlobalKey<FormState>();
-  final _user = User();
+  var _user = User();
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
           title: Text(
         "Fifa Generator",
       )),
-      // resizeToAvoidBottomPadding: false,
       body: _buildForm(context, _authNotif),
     );
   }
@@ -77,6 +77,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       _authMode == AuthMode.LOGIN
                           ? authNotif.logIn(_user)
                           : authNotif.signUp(_user);
+                      form.reset();
+                      _user = User();
                     }
                   },
                 ),
@@ -98,6 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       setState(() {
                         _authMode = AuthMode.SIGNUP;
+                        authNotif.clearError();
                       });
                     },
                     textColor: Colors.black,
@@ -118,6 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       setState(() {
                         _authMode = AuthMode.LOGIN;
+                        authNotif.clearError();
                       });
                     },
                     textColor: Colors.black,
@@ -125,6 +129,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   )
                 ],
               ),
+        Consumer<AuthNotifier>(
+          builder: (context, authNotif, child) =>
+              SnackBarLauncher(error: authNotif.error),
+        ),
       ],
     );
   }
