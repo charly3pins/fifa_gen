@@ -31,7 +31,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildForm(BuildContext context, AuthNotifier authNotif) {
-    return Column(
+    return SingleChildScrollView(
+        child: Column(
       children: <Widget>[
         Container(
           child: Form(
@@ -39,6 +40,21 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
+                _authMode == AuthMode.SIGNUP
+                    ? TextFormField(
+                        decoration: InputDecoration(
+                            labelText: "Name", hasFloatingPlaceholder: true),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter your Name.';
+                          }
+                          return null;
+                        },
+                        onSaved: (val) =>
+                            setState(() => _user.name = val.trim()),
+                      )
+                    : Container(),
+                SizedBox(height: 20),
                 TextFormField(
                   decoration: InputDecoration(
                       labelText: "Username", hasFloatingPlaceholder: true),
@@ -134,6 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
               SnackBarLauncher(error: authNotif.error),
         ),
       ],
-    );
+    ));
   }
 }
