@@ -2,6 +2,7 @@ import 'package:fifagen/models/user.dart';
 import 'package:fifagen/notifiers/auth_api.dart';
 import 'package:fifagen/notifiers/errors.dart';
 import 'package:fifagen/notifiers/users_api.dart';
+import 'package:fifagen/screens/user_profile.dart';
 import 'package:fifagen/widgets/snack_bar_launcher.dart';
 import 'package:flutter/material.dart';
 
@@ -61,8 +62,6 @@ class _SearchState extends State<SearchListScreen> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
-              // TODO check how to improve (bc it performs a non-desired call to API)
-              // _usersNotif.clearUsers();
               Navigator.pop(context);
             },
           ),
@@ -103,7 +102,14 @@ class _SearchState extends State<SearchListScreen> {
           itemBuilder: (BuildContext context, int index) {
             var user = users[index];
             return GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => UserProfileScreen(
+                                user: user,
+                              )));
+                },
                 child: Card(
                     child: ListTile(
                   leading: Container(
