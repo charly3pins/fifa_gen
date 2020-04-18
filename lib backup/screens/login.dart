@@ -167,18 +167,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   InputDecoration _buildInputDecoration(String hint) {
-  return InputDecoration(
-      focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(252, 252, 252, 1))),
-      hintText: hint,
-      enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(151, 151, 151, 1))),
-      hintStyle: TextStyle(color: Color.fromRGBO(252, 252, 252, 1)),
-      //icon: iconPath != '' ? Image.asset(iconPath) : null,
-      errorStyle: TextStyle(color: Color.fromRGBO(248, 218, 87, 1)),
-      errorBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color:  Color.fromRGBO(248, 218, 87, 1))),
-      focusedErrorBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color:  Color.fromRGBO(248, 218, 87, 1))));
-}
+    return InputDecoration(
+        focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color.fromRGBO(252, 252, 252, 1))),
+        hintText: hint,
+        enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color.fromRGBO(151, 151, 151, 1))),
+        hintStyle: TextStyle(color: Color.fromRGBO(252, 252, 252, 1)),
+        //icon: iconPath != '' ? Image.asset(iconPath) : null,
+        errorStyle: TextStyle(color: Color.fromRGBO(248, 218, 87, 1)),
+        errorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color.fromRGBO(248, 218, 87, 1))),
+        focusedErrorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color.fromRGBO(248, 218, 87, 1))));
+  }
 }
