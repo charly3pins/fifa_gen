@@ -8,6 +8,10 @@ class UsersNotifier with ChangeNotifier {
   List<User> _users = [];
   String _error;
 
+  UsersNotifier(String userID){
+    findFriends(userID, "pending");
+  }
+
   /*
   METHODS
   */
@@ -41,7 +45,7 @@ class UsersNotifier with ChangeNotifier {
   final String _baseUrl = 'http://10.0.2.2:8000';
 
   Future<void> findUsers(String query) async {
-    final response = await http.get(_baseUrl + "/users" + "?username=" + query,
+    final response = await http.get(_baseUrl + "/users?username=$query",
         headers: {"Content-Type": 'application/json'});
 
     if (response.statusCode == 200) {
@@ -56,5 +60,25 @@ class UsersNotifier with ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  Future<List<User>> findFriends(String userID, String filter) async {
+    final response = await http.get(
+        _baseUrl + "/users/$userID/friendships?filter=$filter",
+        headers: {"Content-Type": 'application/json'});
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      _users = [];
+      for (var i = 0; i < jsonData.length; i++) {
+        _users.add(User.fromJson(jsonData[i]));
+      }
+      clearError();
+    } else {
+      _error = "Error finding friends";
+    }
+
+    notifyListeners();
+    return _users;
   }
 }

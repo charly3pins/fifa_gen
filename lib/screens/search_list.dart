@@ -84,8 +84,8 @@ class _SearchState extends State<SearchListScreen> {
     if (error != null) {
       return Container(
         child: Consumer<UsersNotifier>(
-          builder: (context, authNotif, child) =>
-              SnackBarLauncher(error: authNotif.error),
+          builder: (context, usersNotif, child) =>
+              SnackBarLauncher(error: usersNotif.error),
         ),
       );
     } else if (query.isNotEmpty && users.length == 0) {

@@ -1,6 +1,6 @@
 import 'package:fifagen/notifiers/auth_api.dart';
-import 'package:fifagen/notifiers/users_api.dart';
 import 'package:fifagen/widgets/auth.dart';
+import 'package:fifagen/widgets/auth_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,17 +10,20 @@ class FifaGenApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => AuthNotifier(),
-          ),
-          ChangeNotifierProvider(
-            create: (context) => UsersNotifier(),
-          ),
-        ],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: AuthWidget(),
-        ));
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => AuthNotifier(),
+        ),
+      ],
+      child: AuthWidgetBuilder(
+        builder: (context, user) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(primarySwatch: Colors.indigo),
+            home: AuthWidget(user: user),
+          );
+        },
+      ),
+    );
   }
 }

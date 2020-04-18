@@ -15,7 +15,7 @@ class AuthNotifier with ChangeNotifier {
   */
   void logout(User user) {
     _loggedIn = false;
-    _user = User();
+    _user = null;
 
     notifyListeners();
   }
@@ -57,7 +57,7 @@ class AuthNotifier with ChangeNotifier {
       clearError();
     } else {
       _error = ErrorUsernameAlreadyExists;
-      _user = User();
+      _user = null;
     }
 
     notifyListeners();
@@ -75,7 +75,7 @@ class AuthNotifier with ChangeNotifier {
       clearError();
     } else {
       _error = ErrorInvalidUsernameOrPassword;
-      _user = User();
+      _user = null;
     }
     notifyListeners();
   }
