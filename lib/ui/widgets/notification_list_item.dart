@@ -1,5 +1,11 @@
+import 'package:fifagen/core/constants/app_constants.dart';
+import 'package:fifagen/core/models/friendship.dart';
 import 'package:fifagen/core/models/user.dart';
+import 'package:fifagen/core/viewmodels/widgets/notifiaction_list_item_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'base_widget.dart';
 
 class NotificationListItem extends StatelessWidget {
   final User friendRequest;
@@ -29,55 +35,72 @@ class NotificationListItem extends StatelessWidget {
         ),
         subtitle: Row(
           children: <Widget>[
-            FlatButton(
-              child: Text("Confirm",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                  )),
-              color: Color(0xFF4B9DFE),
-              textColor: Colors.white,
-              padding:
-                  EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
-              onPressed: () {
-                // Friendship friendship = Friendship(
-                //     userOneID: user.id,
-                //     userTwoID: _loggedUser.id,
-                //     // The pending requests will be from the user.id, so the loggedUser will be the userTwo always
-                //     status: FriendshipStatus.Accepted,
-                //     actionUserID: _loggedUser.id);
-                // FifaGenAPI()
-                //     .answerFriendRequest(friendship)
-                //     .then((resp) {
-                //   setState(() {
-                //     _friendRequests.remove(user);
-                //     Navigator.pushNamed(context, "/userprofile",
-                //         arguments: [_loggedUser, user]);
-                //   });
-                // }).catchError((e) {
-                //   // TODO improve this error check
-                //   showDialog(
-                //       context: context,
-                //       builder: (_) =>
-                //           AlertDialog(title: Text(e.toString())));
-                // });
-              },
-            ),
+            BaseWidget<NotificationListItemModel>(
+                model: NotificationListItemModel(
+                    api: Provider.of(context),
+                    notificationsService: Provider.of(context)),
+                builder: (context, model, child) => FlatButton(
+                      child: Text("Confirm",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          )),
+                      color: Color(0xFF4B9DFE),
+                      textColor: Colors.white,
+                      padding: EdgeInsets.only(
+                          left: 30, right: 30, top: 10, bottom: 10),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5)),
+                      onPressed: () async {
+                        // The pending requests will be from the other user,
+                        // so the logged user will be the userTwo and the actionUser always
+                        final friendship = Friendship(
+                            userOneID: friendRequest.id,
+                            userTwoID:
+                                Provider.of<User>(context, listen: false).id,
+                            status: FriendshipStatusCode.Accepted,
+                            actionUserID:
+                                Provider.of<User>(context, listen: false).id);
+                        var success =
+                            await model.answerFriendRequest(friendship);
+                        if (success) {
+                          model.removeReadNotification(friendRequest);
+                          Navigator.pop(context);
+                        }
+                      },
+                    )),
             SizedBox(width: 10.0),
-            FlatButton(
-              child: Text("Delete",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                  )),
-              color: Colors.white,
-              textColor: Colors.black,
-              padding:
-                  EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.black),
-                  borderRadius: BorderRadius.circular(5)),
-              onPressed: () {},
+            BaseWidget<NotificationListItemModel>(
+              model: NotificationListItemModel(
+                  api: Provider.of(context),
+                  notificationsService: Provider.of(context)),
+              builder: (context, model, child) => FlatButton(
+                child: Text("Delete",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    )),
+                color: Colors.white,
+                textColor: Colors.black,
+                padding:
+                    EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(5)),
+                onPressed: () async {
+                  // The pending requests will be from the other user,
+                  // so the logged user will be the userTwo and the actionUser always
+                  final friendship = Friendship(
+                      userOneID: friendRequest.id,
+                      userTwoID: Provider.of<User>(context, listen: false).id,
+                      status: FriendshipStatusCode.Declined,
+                      actionUserID:
+                          Provider.of<User>(context, listen: false).id);
+                  var success = await model.answerFriendRequest(friendship);
+                  if (success) {
+                    model.removeReadNotification(friendRequest);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
             ),
           ],
         ),

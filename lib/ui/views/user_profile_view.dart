@@ -255,7 +255,7 @@ class UserProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO check if user passed is same as user from Provider.of<User>(context)
+    // TODO check if user passed is same as user from Provider.of<User>(context) to build buttons Accept/Reject or not (to distinguis between logged user profile and others profile)
     return Scaffold(
         appBar: new AppBar(
           title: Text(user.username),

@@ -14,3 +14,10 @@ class Errors {
   static const String FindingUsers = "Error finding users. Please try again";
   static const String NoResultsFoundFor = "No results found for ";
 }
+
+class FriendshipStatusCode {
+  static const int Requested = 0;
+  static const int Accepted = 1;
+  static const int Declined = 2;
+  static const int Blocked = 3;
+}

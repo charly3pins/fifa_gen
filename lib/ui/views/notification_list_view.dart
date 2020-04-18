@@ -12,19 +12,23 @@ class NotificationListView extends StatelessWidget {
     print("notification_list_vieww => Build");
     return Scaffold(
       appBar: AppBar(),
-      body: ListView.builder(
-        itemCount: friendRequests.length,
-        itemBuilder: (context, index) => NotificationListItem(
-          friendRequest: friendRequests[index],
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              RoutePaths.UserProfile,
-              arguments: friendRequests[index],
-            );
-          },
-        ),
-      ),
+      body: friendRequests == null
+          ? Center(
+              child: Text("No pending notifications"),
+            )
+          : ListView.builder(
+              itemCount: friendRequests.length,
+              itemBuilder: (context, index) => NotificationListItem(
+                friendRequest: friendRequests[index],
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    RoutePaths.UserProfile,
+                    arguments: friendRequests[index],
+                  );
+                },
+              ),
+            ),
     );
   }
 }

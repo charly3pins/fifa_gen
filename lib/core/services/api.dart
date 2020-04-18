@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:fifagen/core/constants/app_constants.dart';
+import 'package:fifagen/core/models/friendship.dart';
 import 'package:fifagen/core/models/user.dart';
 import 'package:http/http.dart' as http;
 
-/// The service responsible for networking requests
 class Api {
   static const _baseUrl = 'http://10.0.2.2:8000';
 
@@ -43,5 +43,19 @@ class Api {
     }
 
     return friends;
+  }
+
+  Future updateFriendship(Friendship friendship) async {
+    print("Api => updateFriendship");
+    String jsonBody = json.encode(friendship.toJson());
+    // TODO add catch and return INTERNAL ERROR if the API is down
+    var response = await client.put("$_baseUrl/users/${friendship.actionUserID}/friendships",
+        headers: {"Content-Type": 'application/json'}, body: jsonBody);
+
+    if (response.statusCode == 200 && response.body.isEmpty) {
+      return null;
+    }
+    print("API => ERROR");
+    throw ("Error updating friendship"); // TODO create constant
   }
 }

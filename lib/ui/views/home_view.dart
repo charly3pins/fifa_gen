@@ -55,43 +55,43 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildNotificationsIcon(List<User> friendRequests) {
-    return friendRequests == null
-        ? Container()
-        : Container(
-            width: 40,
-            height: 40,
-            child: Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.notifications),
-                  tooltip: 'Notifications',
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => NotificationListView(
-                                  friendRequests: friendRequests,
-                                )));
-                  },
-                  iconSize: 30,
-                ),
-                _buildNotificationsCounter(friendRequests.length),
-              ],
-            ),
-          );
+    return Container(
+      width: 40,
+      height: 40,
+      child: Stack(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            tooltip: 'Notifications',
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => NotificationListView(
+                            friendRequests: friendRequests,
+                          )));
+            },
+            iconSize: 30,
+          ),
+          friendRequests != null
+              ? _buildNotificationsCounter(friendRequests.length)
+              : Container(),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     print("home_view => Build");
-    final _user = Provider.of<User>(
-        context); // TODO check how to avoid the rebuilds bc of this
+    // TODO check how to avoid the rebuilds bc of this
+    final _user = Provider.of<User>(context);
     return _user == null
         ? CircularProgressIndicator()
         : BaseWidget<HomeViewModel>(
             model: HomeViewModel(
                 authenticationService: Provider.of(context),
-                api: Provider.of(context)),
+                notificationsService: Provider.of(context)),
             onModelReady: (model) => model.findPendingFriendRequests(_user.id),
             builder: (context, model, child) => Scaffold(
                   appBar: AppBar(
@@ -118,7 +118,7 @@ class _HomeViewState extends State<HomeView> {
                       },
                     ),
                     actions: <Widget>[
-                      _buildNotificationsIcon(model.friendRequests),
+                      _buildNotificationsIcon(model.getFriendRequests()),
                       IconButton(
                         icon: const Icon(Icons.search),
                         tooltip: 'Search',
@@ -134,7 +134,7 @@ class _HomeViewState extends State<HomeView> {
                         tooltip: 'Log out',
                         onPressed: () {
                           model.logOut(_user);
-                          Navigator.pop(context);
+                          Navigator.pop(context); // TODO CHECK THIS POP
                         },
                         iconSize: 30,
                       ),
