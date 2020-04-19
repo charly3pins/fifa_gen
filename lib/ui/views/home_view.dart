@@ -113,7 +113,7 @@ class _HomeViewState extends State<HomeView> {
                           context,
                           RoutePaths.UserProfile,
                           arguments: UserProfileViewArguments(
-                              user: _user, friendshipStatus: -1),
+                              user: _user, friendship: null),
                         );
                       },
                     ),
@@ -123,10 +123,8 @@ class _HomeViewState extends State<HomeView> {
                         icon: const Icon(Icons.search),
                         tooltip: 'Search',
                         onPressed: () {
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => SearchListScreen()));
+                          Navigator.pushNamed(context, RoutePaths.Search,
+                              arguments: _user);
                         },
                       ),
                       IconButton(

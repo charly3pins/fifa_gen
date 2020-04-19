@@ -1,4 +1,5 @@
 import 'package:fifagen/core/constants/app_constants.dart';
+import 'package:fifagen/core/models/friendship.dart';
 import 'package:fifagen/core/models/user.dart';
 import 'package:fifagen/core/viewmodels/views/notification_list_view_model.dart';
 import 'package:fifagen/ui/views/arguments/user_profile_view_arguments.dart';
@@ -32,7 +33,8 @@ class NotificationListView extends StatelessWidget {
                     Navigator.pushNamed(context, RoutePaths.UserProfile,
                         arguments: UserProfileViewArguments(
                             user: model.friendRequests[index],
-                            friendshipStatus: FriendshipStatusCode.Requested));
+                            friendship: Friendship(
+                                status: FriendshipStatusCode.Requested)));
                   },
                 ),
               ),

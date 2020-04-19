@@ -1,8 +1,9 @@
+import 'package:fifagen/core/models/friendship.dart';
 import 'package:fifagen/core/models/user.dart';
 
 class UserProfileViewArguments {
   User user;
-  int friendshipStatus;
+  Friendship friendship;
 
-  UserProfileViewArguments({this.user, this.friendshipStatus});
+  UserProfileViewArguments({this.user, this.friendship});
 }

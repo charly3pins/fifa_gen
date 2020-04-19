@@ -9,20 +9,20 @@ import 'package:provider/provider.dart';
 
 class UserProfileView extends StatefulWidget {
   final User user;
-  final int friendshipStatus;
+  final Friendship friendship;
 
-  const UserProfileView({this.user, this.friendshipStatus});
+  const UserProfileView({this.user, this.friendship});
 
   @override
   _UserProfileViewState createState() => _UserProfileViewState();
 }
 
 class _UserProfileViewState extends State<UserProfileView> {
-  int _friendshipStatus;
+  Friendship _friendship;
 
   @override
   initState() {
-    _friendshipStatus = widget.friendshipStatus;
+    if (widget.friendship != null) _friendship = widget.friendship;
     super.initState();
   }
 
@@ -83,7 +83,7 @@ class _UserProfileViewState extends State<UserProfileView> {
     );
   }
 
-  Widget _buildAddFriend() {
+  Widget _buildAddFriend(BuildContext context, String loggedUserID) {
     return FlatButton(
       color: Color(0xFF4B9DFE),
       textColor: Colors.white,
@@ -102,22 +102,24 @@ class _UserProfileViewState extends State<UserProfileView> {
       ),
       padding: EdgeInsets.only(left: 20, right: 20, top: 7, bottom: 7),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      onPressed: () {
-        // Friendship friendship = Friendship(
-        //     userOneID: _loggedUser.id,
-        //     userTwoID: user.id,
-        //     status: FriendshipStatus.Pending,
-        //     actionUserID: _loggedUser.id);
-        // FifaGenAPI().createFriendRequest(friendship).then((friendRequest) {
-        //   setState(() {
-        //     _requestState = RequestState.PENDING;
-        //     _friendship = friendRequest;
-        //   });
-        // }).catchError((e) {
-        //   // TODO improve this error check
-        //   showDialog(
-        //       context: context, builder: (_) => AlertDialog(title: Text(e)));
-        // });
+      onPressed: () async {
+        // The create request will be from the logged user,
+        // so the visited user will be the userTwo and the actionUser will be the logged one
+        final friendship = Friendship(
+            userOneID: loggedUserID,
+            userTwoID: widget.user.id,
+            status: FriendshipStatusCode.Requested,
+            actionUserID: loggedUserID);
+        var model = Provider.of<UserProfileViewModel>(context, listen: false);
+        var success = await model.createFriendRequest(friendship);
+        if (success) {
+          model.removeReadNotification(widget.user);
+          model.findFriends(widget.user.id);
+          setState(() {
+            if (_friendship == null) _friendship = Friendship();
+            _friendship = friendship;
+          });
+        }
       },
     );
   }
@@ -149,7 +151,8 @@ class _UserProfileViewState extends State<UserProfileView> {
               model.removeReadNotification(widget.user);
               model.findFriends(widget.user.id);
               setState(() {
-                _friendshipStatus = FriendshipStatusCode.Accepted;
+                if (_friendship == null) _friendship = Friendship();
+                _friendship = friendship;
               });
             }
           },
@@ -180,7 +183,8 @@ class _UserProfileViewState extends State<UserProfileView> {
             if (success) {
               model.removeReadNotification(widget.user);
               setState(() {
-                _friendshipStatus = FriendshipStatusCode.Declined;
+                if (_friendship == null) _friendship = Friendship();
+                _friendship = friendship;
               });
             }
           },
@@ -190,20 +194,25 @@ class _UserProfileViewState extends State<UserProfileView> {
   }
 
   Widget _buildStateButton(BuildContext context, String loggedUserID) {
-    switch (_friendshipStatus) {
+    // If no friendship is provided its bc they are not friends
+    if (_friendship == null) return _buildAddFriend(context, loggedUserID);
+
+    switch (_friendship.status) {
       case FriendshipStatusCode.Accepted:
         return _buildAccepted();
       case FriendshipStatusCode.Requested:
-        return loggedUserID == widget.user.id
+        print("loggedUserID $loggedUserID");
+        print("widget.user.id ${widget.user.id}");
+        return _friendship.actionUserID == loggedUserID
             ? _buildRequested()
             : _buildAnswerRequestButtons(context, loggedUserID);
       // TODO add DECLINED and BLOCKED
       default:
-        return _buildAddFriend();
+        return _buildAddFriend(context, loggedUserID);
     }
   }
 
-  Widget _buildButtons(BuildContext context, String loggedUserID) {
+  Widget _buildButtonsRow(BuildContext context, String loggedUserID) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -220,7 +229,9 @@ class _UserProfileViewState extends State<UserProfileView> {
           context,
           RoutePaths.UserProfile,
           arguments: UserProfileViewArguments(
-              user: friend, friendshipStatus: FriendshipStatusCode.Accepted),
+            user: friend,
+            friendship: Friendship(status: FriendshipStatusCode.Accepted),
+          ),
         );
       },
       child: Column(
@@ -238,10 +249,10 @@ class _UserProfileViewState extends State<UserProfileView> {
             ),
           ),
           Text(
-            friend.name,
+            friend.username,
             style: TextStyle(
               color: Colors.black54,
-              fontSize: 14.0,
+              fontSize: 12.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -276,6 +287,7 @@ class _UserProfileViewState extends State<UserProfileView> {
               ),
               Row(
                 children: <Widget>[
+                  SizedBox(width: 20),
                   for (var friend in friends) _buildFriendItem(context, friend),
                 ],
               ),
@@ -320,10 +332,15 @@ class _UserProfileViewState extends State<UserProfileView> {
                 ),
               ),
               SizedBox(height: 30.0),
-              _friendshipStatus == FriendshipStatusCode.Accepted ||
+              // IF they are friends or the users is in their own profile,
+              // show the friends
+              // ELSE show the buttons
+              (_friendship != null &&
+                          _friendship.status ==
+                              FriendshipStatusCode.Accepted) ||
                       (loggedUser != null && loggedUser.id == widget.user.id)
                   ? _buildFriendsContainer(context, model.friends)
-                  : _buildButtons(context, loggedUser.id)
+                  : _buildButtonsRow(context, loggedUser.id)
             ],
           ),
         ));

@@ -23,6 +23,21 @@ class UserProfileViewModel extends BaseModel {
     setBusy(false);
   }
 
+  Future<bool> createFriendRequest(Friendship friendship) async {
+    setBusy(true);
+    return await _api.createFriendship(friendship).then((_) {
+      print("createFriendRequest => OK");
+      setBusy(false);
+      setError("");
+      return true;
+    }).catchError((e) {
+      print("createFriendRequest => ERROR: $e");
+      setBusy(false);
+      setError(e);
+      return false;
+    });
+  }
+
   Future<bool> answerFriendRequest(Friendship friendship) async {
     setBusy(true);
     return await _api.updateFriendship(friendship).then((_) {
@@ -39,10 +54,14 @@ class UserProfileViewModel extends BaseModel {
   }
 
   void removeReadNotification(User u) {
-    setBusy(true);
-    final int indxOf = _notificationsService.friendRequests.indexOf(u);
-    _notificationsService.friendRequests.removeAt(indxOf);
-    setBusy(false);
-    setError("");
+    if (_notificationsService.friendRequests != null) {
+      setBusy(true);
+      final int indxOf = _notificationsService.friendRequests.indexOf(u);
+      if (indxOf >= 0) {
+        _notificationsService.friendRequests.removeAt(indxOf);
+      }
+      setBusy(false);
+      setError("");
+    }
   }
 }

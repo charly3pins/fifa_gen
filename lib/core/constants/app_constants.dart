@@ -3,6 +3,7 @@ class RoutePaths {
   static const String Home = '/';
   static const String Notifications = 'notifications';
   static const String UserProfile = 'userprofile';
+  static const String Search = 'search';
 }
 
 class Errors {
