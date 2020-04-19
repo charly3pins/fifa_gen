@@ -17,6 +17,7 @@ class UserProfileViewModel extends BaseModel {
 
   List<User> friends;
   Future findFriends(String userID) async {
+    print("findfriends $userID");
     setBusy(true);
     friends = await _api.findFriends(userID, "friends");
     setBusy(false);

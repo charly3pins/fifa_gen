@@ -147,6 +147,7 @@ class _UserProfileViewState extends State<UserProfileView> {
             var success = await model.answerFriendRequest(friendship);
             if (success) {
               model.removeReadNotification(widget.user);
+              model.findFriends(widget.user.id);
               setState(() {
                 _friendshipStatus = FriendshipStatusCode.Accepted;
               });
@@ -284,6 +285,7 @@ class _UserProfileViewState extends State<UserProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    print("build => userprofile");
     final loggedUser = Provider.of<User>(context);
 
     return Scaffold(
