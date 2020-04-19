@@ -40,5 +40,5 @@ class HomeViewModel extends BaseModel {
     });
   }
 
-  List<User> getFriendRequests() => _notificationsService.friendRequests;
+  List<User> get friendRequests => _notificationsService.friendRequests;
 }

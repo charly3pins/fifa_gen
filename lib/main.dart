@@ -3,6 +3,7 @@ import 'package:fifagen/core/models/user.dart';
 import 'package:fifagen/core/services/api.dart';
 import 'package:fifagen/core/services/authentication_service.dart';
 import 'package:fifagen/core/services/notifications_service.dart';
+import 'package:fifagen/core/viewmodels/views/notification_list_view_model.dart';
 import 'package:fifagen/ui/router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,11 @@ class MyApp extends StatelessWidget {
           create: (context) =>
               Provider.of<AuthenticationService>(context, listen: false).user,
         ),
-        Provider<List<User>>(create: (context)=> Provider.of<NotificationsService>(context, listen: false).friendRequests,)
+        Provider<List<User>>(
+          create: (context) =>
+              Provider.of<NotificationsService>(context, listen: false)
+                  .friendRequests,
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

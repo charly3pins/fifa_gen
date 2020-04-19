@@ -1,6 +1,7 @@
 import 'package:fifagen/core/constants/app_constants.dart';
 import 'package:fifagen/core/models/user.dart';
 import 'package:fifagen/core/viewmodels/views/home_view_model.dart';
+import 'package:fifagen/ui/views/arguments/user_profile_view_arguments.dart';
 import 'package:fifagen/ui/views/notification_list_view.dart';
 import 'package:fifagen/ui/widgets/base_widget.dart';
 import 'package:flutter/material.dart';
@@ -67,9 +68,7 @@ class _HomeViewState extends State<HomeView> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => NotificationListView(
-                            friendRequests: friendRequests,
-                          )));
+                      builder: (context) => NotificationListView()));
             },
             iconSize: 30,
           ),
@@ -113,12 +112,13 @@ class _HomeViewState extends State<HomeView> {
                         Navigator.pushNamed(
                           context,
                           RoutePaths.UserProfile,
-                          arguments: _user,
+                          arguments: UserProfileViewArguments(
+                              user: _user, friendshipStatus: -1),
                         );
                       },
                     ),
                     actions: <Widget>[
-                      _buildNotificationsIcon(model.getFriendRequests()),
+                      _buildNotificationsIcon(model.friendRequests),
                       IconButton(
                         icon: const Icon(Icons.search),
                         tooltip: 'Search',

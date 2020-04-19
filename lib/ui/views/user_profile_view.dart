@@ -1,13 +1,16 @@
 import 'package:fifagen/core/constants/app_constants.dart';
+import 'package:fifagen/core/models/friendship.dart';
 import 'package:fifagen/core/models/user.dart';
 import 'package:fifagen/core/viewmodels/views/user_profile_view_model.dart';
+import 'package:fifagen/ui/views/arguments/user_profile_view_arguments.dart';
 import 'package:fifagen/ui/widgets/base_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class UserProfileView extends StatelessWidget {
   final User user;
-  const UserProfileView({this.user});
+  final int friendshipStatus;
+  const UserProfileView({this.user, this.friendshipStatus});
 
   Widget _buildProfileImage() {
     return Center(
@@ -105,7 +108,7 @@ class UserProfileView extends StatelessWidget {
     );
   }
 
-  Widget _buildAnswerRequestButtons() {
+  Widget _buildAnswerRequestButtons(BuildContext context, String loggedUserID) {
     return Row(
       children: <Widget>[
         FlatButton(
@@ -117,27 +120,21 @@ class UserProfileView extends StatelessWidget {
           textColor: Colors.white,
           padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          onPressed: () {
-            // The pending requests will be from the user.id,
-            // so the _loggedUser will be the userTwo always
-            // Friendship friendship = Friendship(
-            //     userOneID: user.id,
-            //     userTwoID: _loggedUser.id,
-            //     status: FriendshipStatus.Accepted,
-            //     actionUserID: _loggedUser.id);
-            // FifaGenAPI().answerFriendRequest(friendship).then((resp) {
-            //   friendship.actionUserID = user.id;
-            //   friendship.status = FriendshipStatus.Pending;
-            //   widget.parentAction(friendship);
-            //   setState(() {
-            //     _requestState = RequestState.ACCEPTED;
-            //   });
-            // }).catchError((e) {
-            //   // TODO improve this error check
-            //   showDialog(
-            //       context: context,
-            //       builder: (_) => AlertDialog(title: Text(e.toString())));
-            // });
+          onPressed: () async {
+            // The pending requests will be from the other user,
+            // so the logged user will be the userTwo and the actionUser always
+            final friendship = Friendship(
+                userOneID: user.id,
+                userTwoID: loggedUserID,
+                status: FriendshipStatusCode.Accepted,
+                actionUserID: loggedUserID);
+            var model =
+                Provider.of<UserProfileViewModel>(context, listen: false);
+            var success = await model.answerFriendRequest(friendship);
+            if (success) {
+              model.removeReadNotification(user);
+              // Change state
+            }
           },
         ),
         SizedBox(width: 10.0),
@@ -152,33 +149,47 @@ class UserProfileView extends StatelessWidget {
           shape: RoundedRectangleBorder(
               side: BorderSide(color: Colors.black),
               borderRadius: BorderRadius.circular(5)),
-          onPressed: () {},
+          onPressed: () async {
+            // The pending requests will be from the other user,
+            // so the logged user will be the userTwo and the actionUser always
+            final friendship = Friendship(
+                userOneID: user.id,
+                userTwoID: loggedUserID,
+                status: FriendshipStatusCode.Declined,
+                actionUserID: loggedUserID);
+            var model =
+                Provider.of<UserProfileViewModel>(context, listen: false);
+            var success = await model.answerFriendRequest(friendship);
+            if (success) {
+              model.removeReadNotification(user);
+              // Change state
+            }
+          },
         ),
       ],
     );
   }
 
-  // Widget _buildStateButton() {
-  //   switch (_requestState) {
-  //     case RequestState.ACCEPTED:
-  //       return _buildAccepted();
-  //     case RequestState.PENDING:
-  //       if (_friendship.actionUserID != _loggedUser.id) {
-  //         return _buildAnswerRequestButtons();
-  //       }
-  //       return _buildRequested();
-  //     // TODO add DECLINED and BLOCKED
-  //     default:
-  //       return _buildAddFriend();
-  //   }
-  // }
+  Widget _buildStateButton(BuildContext context, String loggedUserID) {
+    switch (friendshipStatus) {
+      case FriendshipStatusCode.Accepted:
+        return _buildAccepted();
+      case FriendshipStatusCode.Requested:
+        return loggedUserID == user.id
+            ? _buildRequested()
+            : _buildAnswerRequestButtons(context, loggedUserID);
+      // TODO add DECLINED and BLOCKED
+      default:
+        return _buildAddFriend();
+    }
+  }
 
-  Widget _buildButtons() {
+  Widget _buildButtons(BuildContext context, String loggedUserID) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        //_buildStateButton(),
+        _buildStateButton(context, loggedUserID),
       ],
     );
   }
@@ -189,11 +200,11 @@ class UserProfileView extends StatelessWidget {
         Navigator.pushNamed(
           context,
           RoutePaths.UserProfile,
-          arguments: friend,
+          arguments: UserProfileViewArguments(
+              user: friend, friendshipStatus: FriendshipStatusCode.Accepted),
         );
       },
       child: Column(
-        //mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           SizedBox(width: 50),
           Container(
@@ -255,13 +266,26 @@ class UserProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO check if user passed is same as user from Provider.of<User>(context) to build buttons Accept/Reject or not (to distinguis between logged user profile and others profile)
+    final loggedUser = Provider.of<User>(context);
     return Scaffold(
-        appBar: new AppBar(
-          title: Text(user.username),
-        ),
+        appBar: loggedUser != null && loggedUser.id == user.id
+            ? AppBar(
+                title: Text(user.username),
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.settings),
+                    // TODO implement settings page
+                    onPressed: () {},
+                  )
+                ],
+              )
+            : AppBar(
+                title: Text(user.username),
+              ),
         body: BaseWidget<UserProfileViewModel>(
-          model: UserProfileViewModel(api: Provider.of(context)),
+          model: UserProfileViewModel(
+              api: Provider.of(context),
+              notificationsService: Provider.of(context)),
           onModelReady: (model) => model.findFriends(user.id),
           builder: (context, model, child) => Column(
             children: <Widget>[
@@ -275,7 +299,10 @@ class UserProfileView extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 30.0),
-              _buildFriendsContainer(context, model.friends),
+              friendshipStatus == FriendshipStatusCode.Accepted ||
+                      (loggedUser != null && loggedUser.id == user.id)
+                  ? _buildFriendsContainer(context, model.friends)
+                  : _buildButtons(context, loggedUser.id)
             ],
           ),
         ));

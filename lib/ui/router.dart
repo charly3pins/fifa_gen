@@ -1,5 +1,6 @@
 import 'package:fifagen/core/constants/app_constants.dart';
 import 'package:fifagen/core/models/user.dart';
+import 'package:fifagen/ui/views/arguments/user_profile_view_arguments.dart';
 import 'package:fifagen/ui/views/home_view.dart';
 import 'package:fifagen/ui/views/login_view.dart';
 import 'package:fifagen/ui/views/notification_list_view.dart';
@@ -15,17 +16,19 @@ class Router {
       case RoutePaths.Login:
         return MaterialPageRoute(builder: (_) => LoginView());
       case RoutePaths.Notifications:
-        var friendRequests = settings.arguments as List<User>;
+        //var friendRequests = settings.arguments as List<User>;
         return MaterialPageRoute(
             builder: (_) => NotificationListView(
-                  friendRequests: friendRequests,
+                //    friendRequests: friendRequests,
                 ));
       case RoutePaths.UserProfile:
-        var user = settings.arguments as User;
-        return MaterialPageRoute(builder: (_) => UserProfileView(user: user));
-      // case RoutePaths.Post:
-      //   var post = settings.arguments as Post;
-      //   return MaterialPageRoute(builder: (_) => PostView(post: post));
+        var args = settings.arguments as UserProfileViewArguments;
+        return MaterialPageRoute(
+            builder: (_) => UserProfileView(
+                  user: args.user,
+                  friendshipStatus: args.friendshipStatus,
+                ));
+
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(
