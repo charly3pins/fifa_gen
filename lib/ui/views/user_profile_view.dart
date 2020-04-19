@@ -7,10 +7,24 @@ import 'package:fifagen/ui/widgets/base_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class UserProfileView extends StatelessWidget {
+class UserProfileView extends StatefulWidget {
   final User user;
   final int friendshipStatus;
+
   const UserProfileView({this.user, this.friendshipStatus});
+
+  @override
+  _UserProfileViewState createState() => _UserProfileViewState();
+}
+
+class _UserProfileViewState extends State<UserProfileView> {
+  int _friendshipStatus;
+
+  @override
+  initState() {
+    _friendshipStatus = widget.friendshipStatus;
+    super.initState();
+  }
 
   Widget _buildProfileImage() {
     return Center(
@@ -19,7 +33,7 @@ class UserProfileView extends StatelessWidget {
         height: 140.0,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/profile/" + user.profilePicture),
+            image: AssetImage("assets/profile/" + widget.user.profilePicture),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(80.0),
@@ -124,7 +138,7 @@ class UserProfileView extends StatelessWidget {
             // The pending requests will be from the other user,
             // so the logged user will be the userTwo and the actionUser always
             final friendship = Friendship(
-                userOneID: user.id,
+                userOneID: widget.user.id,
                 userTwoID: loggedUserID,
                 status: FriendshipStatusCode.Accepted,
                 actionUserID: loggedUserID);
@@ -132,8 +146,10 @@ class UserProfileView extends StatelessWidget {
                 Provider.of<UserProfileViewModel>(context, listen: false);
             var success = await model.answerFriendRequest(friendship);
             if (success) {
-              model.removeReadNotification(user);
-              // Change state
+              model.removeReadNotification(widget.user);
+              setState(() {
+                _friendshipStatus = FriendshipStatusCode.Accepted;
+              });
             }
           },
         ),
@@ -153,7 +169,7 @@ class UserProfileView extends StatelessWidget {
             // The pending requests will be from the other user,
             // so the logged user will be the userTwo and the actionUser always
             final friendship = Friendship(
-                userOneID: user.id,
+                userOneID: widget.user.id,
                 userTwoID: loggedUserID,
                 status: FriendshipStatusCode.Declined,
                 actionUserID: loggedUserID);
@@ -161,8 +177,10 @@ class UserProfileView extends StatelessWidget {
                 Provider.of<UserProfileViewModel>(context, listen: false);
             var success = await model.answerFriendRequest(friendship);
             if (success) {
-              model.removeReadNotification(user);
-              // Change state
+              model.removeReadNotification(widget.user);
+              setState(() {
+                _friendshipStatus = FriendshipStatusCode.Declined;
+              });
             }
           },
         ),
@@ -171,11 +189,11 @@ class UserProfileView extends StatelessWidget {
   }
 
   Widget _buildStateButton(BuildContext context, String loggedUserID) {
-    switch (friendshipStatus) {
+    switch (_friendshipStatus) {
       case FriendshipStatusCode.Accepted:
         return _buildAccepted();
       case FriendshipStatusCode.Requested:
-        return loggedUserID == user.id
+        return loggedUserID == widget.user.id
             ? _buildRequested()
             : _buildAnswerRequestButtons(context, loggedUserID);
       // TODO add DECLINED and BLOCKED
@@ -267,10 +285,11 @@ class UserProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loggedUser = Provider.of<User>(context);
+
     return Scaffold(
-        appBar: loggedUser != null && loggedUser.id == user.id
+        appBar: loggedUser != null && loggedUser.id == widget.user.id
             ? AppBar(
-                title: Text(user.username),
+                title: Text(widget.user.username),
                 actions: <Widget>[
                   IconButton(
                     icon: Icon(Icons.settings),
@@ -280,27 +299,27 @@ class UserProfileView extends StatelessWidget {
                 ],
               )
             : AppBar(
-                title: Text(user.username),
+                title: Text(widget.user.username),
               ),
         body: BaseWidget<UserProfileViewModel>(
           model: UserProfileViewModel(
               api: Provider.of(context),
               notificationsService: Provider.of(context)),
-          onModelReady: (model) => model.findFriends(user.id),
+          onModelReady: (model) => model.findFriends(widget.user.id),
           builder: (context, model, child) => Column(
             children: <Widget>[
               _buildProfileImage(),
               SizedBox(height: 10.0),
               Text(
-                user.name,
+                widget.user.name,
                 style: TextStyle(
                   fontSize: 28.0,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               SizedBox(height: 30.0),
-              friendshipStatus == FriendshipStatusCode.Accepted ||
-                      (loggedUser != null && loggedUser.id == user.id)
+              _friendshipStatus == FriendshipStatusCode.Accepted ||
+                      (loggedUser != null && loggedUser.id == widget.user.id)
                   ? _buildFriendsContainer(context, model.friends)
                   : _buildButtons(context, loggedUser.id)
             ],
