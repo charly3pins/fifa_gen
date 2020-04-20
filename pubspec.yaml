@@ -14,7 +14,7 @@ description: Fifa Tournaments Generator
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
@@ -24,6 +24,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   http: ^0.12.0+4
+  provider: ^4.0.5
 
 dev_dependencies:
   flutter_test:
@@ -42,9 +43,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/fifa-20-bg.jpeg
-    - assets/law-mustache-thumb.png
-    - assets/gerard.jpg
+    - assets/profile/soccer_ball.png
+    - assets/profile/man.png
+    - assets/profile/woman.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
