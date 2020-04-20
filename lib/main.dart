@@ -28,11 +28,6 @@ class MyApp extends StatelessWidget {
           create: (context) =>
               Provider.of<AuthenticationService>(context, listen: false).user,
         ),
-        Provider<List<User>>(
-          create: (context) =>
-              Provider.of<NotificationsService>(context, listen: false)
-                  .friendRequests,
-        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

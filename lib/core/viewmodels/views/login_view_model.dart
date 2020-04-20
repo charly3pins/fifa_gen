@@ -25,4 +25,20 @@ class LoginViewModel extends BaseModel {
       return false;
     });
   }
+
+  Future<bool> signUp(User user) async {
+    print("loginviewmodel => signUp");
+    setBusy(true);
+    return await _authenticationService.signUp(user).then((success) {
+      print("loginviewmodel => OK");
+      setBusy(false);
+      setError("");
+      return success;
+    }).catchError((e) {
+      print("loginviewmodel => ERROR: $e");
+      setBusy(false);
+      setError(e);
+      return false;
+    });
+  }
 }

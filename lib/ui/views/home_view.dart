@@ -85,13 +85,14 @@ class _HomeViewState extends State<HomeView> {
     print("home_view => Build");
     // TODO check how to avoid the rebuilds bc of this
     final _user = Provider.of<User>(context);
-    return _user == null
-        ? CircularProgressIndicator()
-        : BaseWidget<HomeViewModel>(
+    return BaseWidget<HomeViewModel>(
             model: HomeViewModel(
                 authenticationService: Provider.of(context),
                 notificationsService: Provider.of(context)),
-            onModelReady: (model) => model.findPendingFriendRequests(_user.id),
+            onModelReady: (model) => {
+                  model.setBusy(false),
+                  model.findPendingFriendRequests(_user.id)
+                },
             builder: (context, model, child) => Scaffold(
                   appBar: AppBar(
                     leading: IconButton(

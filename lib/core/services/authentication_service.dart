@@ -27,6 +27,18 @@ class AuthenticationService {
     });
   }
 
+  Future<bool> signUp(User user) async {
+    print("AuthenticationService => signUp");
+    return await _api.signUp(user).then((createdUser) {
+      _userController.add(createdUser);
+      print("AuthenticationService => OK");
+      return true;
+    }).catchError((e) {
+      print("AuthenticationService => ERROR: $e");
+      throw (e);
+    });
+  }
+
   void logOut(User user) {
     // TODO check if its necessary to clean something from the Stream
   }

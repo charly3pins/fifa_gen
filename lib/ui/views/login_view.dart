@@ -6,13 +6,16 @@ import 'package:fifagen/ui/widgets/snack_bar_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+enum AuthMode { LOGIN, SIGNUP }
+
 class LoginView extends StatefulWidget {
   @override
   _LoginViewState createState() => _LoginViewState();
 }
 
 class _LoginViewState extends State<LoginView> {
-  //final TextEditingController _controller = TextEditingController();
+  AuthMode _authMode = AuthMode.LOGIN;
+
   final _formKey = GlobalKey<FormState>();
   var _user = User();
 
@@ -60,6 +63,22 @@ class _LoginViewState extends State<LoginView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  _authMode == AuthMode.SIGNUP
+                      ? TextFormField(
+                          decoration: _buildInputDecoration("Name"),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter your Name.';
+                            }
+                            return null;
+                          },
+                          style: TextStyle(
+                              color: Color.fromRGBO(252, 252, 252, 1),
+                              fontFamily: 'RadikalLight'),
+                          onSaved: (val) =>
+                              setState(() => _user.name = val.trim()),
+                        )
+                      : Container(),
                   SizedBox(height: 20),
                   TextFormField(
                     decoration: _buildInputDecoration("Username"),
@@ -94,7 +113,7 @@ class _LoginViewState extends State<LoginView> {
                   SizedBox(height: 20),
                   RaisedButton(
                     child: Text(
-                      /*_authMode == AuthMode.LOGIN ? */ "Log in", // : "Sign up",
+                      _authMode == AuthMode.LOGIN ? "Log in" : "Sign up",
                       style: TextStyle(
                           color: Color.fromRGBO(40, 48, 52, 1),
                           fontFamily: 'RadikalMedium',
@@ -107,14 +126,59 @@ class _LoginViewState extends State<LoginView> {
                       if (form.validate()) {
                         form.save();
                         form.reset();
-                        var loginSuccess = await model.logIn(_user);
-                        if (loginSuccess) {
+                        var success = _authMode == AuthMode.LOGIN
+                            ? await model.logIn(_user)
+                            : await model.signUp(_user);
+                        if (success) {
                           _user = User();
                           Navigator.pushNamed(context, RoutePaths.Home);
                         }
                       }
                     },
                   ),
+                  _authMode == AuthMode.LOGIN
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(height: 40),
+                            Text(
+                              "Not a member?",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            FlatButton(
+                              onPressed: () {
+                                setState(() {
+                                  _authMode = AuthMode.SIGNUP;
+                                  model.setError(null);
+                                });
+                              },
+                              textColor: Colors.white,
+                              child: Text("Sign up"),
+                            )
+                          ],
+                        )
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(height: 40),
+                            Text(
+                              "Already a member?",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            FlatButton(
+                              onPressed: () {
+                                setState(() {
+                                  _authMode = AuthMode.LOGIN;
+                                  model.setError(null);
+                                });
+                              },
+                              textColor: Colors.white,
+                              child: Text("Log in"),
+                            )
+                          ],
+                        ),
                   model.error != null && model.error.isNotEmpty
                       ? SnackBarLauncher(error: model.error)
                       : Container(),

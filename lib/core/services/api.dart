@@ -25,6 +25,22 @@ class Api {
     throw (Errors.InvalidUsernameOrPassword);
   }
 
+  Future<User> signUp(User user) async {
+    print("Api => signUp");
+    user.profilePicture = "soccer_ball.png";
+    String jsonBody = json.encode(user.toJson());
+    // TODO add catch and return INTERNAL ERROR if the API is down
+    var response = await client.post("$_baseUrl/users",
+        headers: {"Content-Type": 'application/json'}, body: jsonBody);
+
+    if (response.statusCode == 200) {
+      print("API => OK");
+      return User.fromJson(json.decode(response.body));
+    }
+    print("API => ERROR");
+    throw (Errors.UsernameAlreadyExists);
+  }
+
   Future<List<User>> findUsers(String query) async {
     final response = await client.get("$_baseUrl/users?username=$query",
         headers: {"Content-Type": 'application/json'});
