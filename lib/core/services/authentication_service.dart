@@ -8,7 +8,7 @@ class AuthenticationService {
 
   AuthenticationService({Api api}) : _api = api;
 
-  StreamController<User> _userController = StreamController<User>();
+  StreamController<User> _userController = StreamController<User>(sync: true);
 
   Stream<User> get user => _userController.stream;
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fifagen/core/constants/app_constants.dart';
 import 'package:fifagen/core/models/friendship.dart';
+import 'package:fifagen/core/models/group.dart';
 import 'package:fifagen/core/models/user.dart';
 import 'package:http/http.dart' as http;
 
@@ -123,5 +124,23 @@ class Api {
     }
 
     throw ("Error getting friendship"); // TODO create constant
+  }
+
+  Future<List<Group>> findGroups(String userID) async {
+    // TODO add catch and return INTERNAL ERROR if the API is down
+    var response = await client.get("$_baseUrl/groups?userID=$userID",
+        headers: {"Content-Type": 'application/json'});
+
+    var groups = List<Group>();
+    if (response.statusCode == 200) {
+      final parsed = json.decode(response.body) as List<dynamic>;
+      for (var group in parsed) {
+        groups.add(Group.fromJson(group));
+      }
+    } else {
+      throw (Errors.FindingUsers);
+    }
+
+    return groups;
   }
 }

@@ -4,6 +4,7 @@ class RoutePaths {
   static const String Notifications = 'notifications';
   static const String UserProfile = 'userprofile';
   static const String Search = 'search';
+  static const String GroupCreate = 'group-create';
 }
 
 class Errors {
