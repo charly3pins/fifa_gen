@@ -79,7 +79,7 @@ class _GroupCreateViewState extends State<GroupCreateView> {
                   if (form.validate()) {
                     form.save();
                     form.reset();
-
+                    // TODO add user logged into selectedmembers before creating the group
                     // TODO _group.members = model.selectedMembers;
                     // TODO model.createGroup(_group);
                     // TODO Navigator. go to Groups in the home()
