@@ -18,6 +18,7 @@ class GroupViewModel extends BaseModel {
 
   Future findFriends(String userID) async {
     print("findfriends $userID");
+    setError(null);
     setBusy(true);
     _friends = await _api.findFriends(userID, "friends");
     setBusy(false);
@@ -26,6 +27,7 @@ class GroupViewModel extends BaseModel {
   }
 
   void addMember(User member) {
+    setError(null);
     setBusy(true);
     if (_selectedMembers.indexOf(member) == -1) {
       _selectedMembers.add(member);
@@ -38,6 +40,7 @@ class GroupViewModel extends BaseModel {
   }
 
   void removeMember(User member) {
+    setError(null);
     setBusy(true);
     _selectedMembers.remove(member);
     setBusy(false);
