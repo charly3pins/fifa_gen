@@ -1,4 +1,5 @@
 import 'package:fifagen/core/models/group.dart';
+import 'package:fifagen/core/models/member.dart';
 import 'package:fifagen/core/models/user.dart';
 import 'package:fifagen/core/viewmodels/views/group_view_model.dart';
 import 'package:fifagen/ui/widgets/base_widget.dart';
@@ -16,79 +17,96 @@ class GroupCreateView extends StatefulWidget {
 
 class _GroupCreateViewState extends State<GroupCreateView> {
   ViewMode _viewMode = ViewMode.MEMBERS;
-  Group _group;
+  var _group = Group();
   final _createGroupFormKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    Provider.of<GroupViewModel>(context, listen: false)
+        .findFriends(Provider.of<User>(context, listen: false).id);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     print("group view => BUILD");
-    return BaseWidget<GroupViewModel>(
-      model: GroupViewModel(
-        api: Provider.of(context),
-      ),
-      onModelReady: (model) =>
-          model.findFriends(Provider.of<User>(context, listen: false).id),
-      builder: (context, model, child) => Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              _viewMode == ViewMode.MEMBERS
-                  ? Navigator.pop(context)
-                  : setState(() {
-                      _viewMode = ViewMode.MEMBERS;
-                    });
-            },
-          ),
-          title: Column(
-            children: <Widget>[
-              Text("New group"),
-              Text(
-                _viewMode == ViewMode.MEMBERS
-                    ? model.selectedMembers.isEmpty
-                        ? "Add members"
-                        : "${model.selectedMembers.length.toString()} of ${model.friends.length.toString()} selected"
-                    : "Add name",
-                style: TextStyle(fontSize: 15.0),
-                textAlign: TextAlign.left,
-              ),
-            ],
-          ),
+
+    final model = Provider.of<GroupViewModel>(context);
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            if (_viewMode == ViewMode.MEMBERS) {
+              model.clearSelectedMembers();
+              Navigator.pop(context);
+            } else {
+              setState(() {
+                _viewMode = ViewMode.MEMBERS;
+              });
+            }
+          },
         ),
-        body: _viewMode == ViewMode.MEMBERS
-            ? _buildAddMembersBody(context, model)
-            : _buildAddDetailsBody(context, model),
-        floatingActionButton: _viewMode == ViewMode.MEMBERS
-            ? FloatingActionButton(
-                onPressed: () {
-                  if (model.selectedMembers.isEmpty) {
-                    model.setError("Select at least 1 member");
-                  } else {
-                    setState(() {
-                      _viewMode = ViewMode.DETAILS;
-                    });
-                  }
-                },
-                child: Icon(Icons.arrow_forward, color: Colors.black),
-                backgroundColor: Colors.amberAccent,
-              )
-            : FloatingActionButton(
-                onPressed: () {
-                  // TODO check name is provided
-                  final form = _createGroupFormKey.currentState;
-                  if (form.validate()) {
-                    form.save();
-                    form.reset();
-                    // TODO add user logged into selectedmembers before creating the group
-                    // TODO _group.members = model.selectedMembers;
-                    // TODO model.createGroup(_group);
-                    // TODO Navigator. go to Groups in the home()
-                  }
-                },
-                child: Icon(Icons.check, color: Colors.black),
-                backgroundColor: Colors.amberAccent,
-              ),
+        title: Column(
+          children: <Widget>[
+            Text("New group"),
+            Text(
+              _viewMode == ViewMode.MEMBERS
+                  ? model.selectedMembers.isEmpty
+                      ? "Add members"
+                      : "${model.selectedMembers.length.toString()} of ${model.friends.length.toString()} selected"
+                  : "Add name",
+              style: TextStyle(fontSize: 15.0),
+              textAlign: TextAlign.left,
+            ),
+          ],
+        ),
       ),
+      body: _viewMode == ViewMode.MEMBERS
+          ? _buildAddMembersBody(context, model)
+          : _buildAddDetailsBody(context, model),
+      floatingActionButton: _viewMode == ViewMode.MEMBERS
+          ? FloatingActionButton(
+              onPressed: () {
+                if (model.selectedMembers.isEmpty) {
+                  model.setError("Select at least 1 member");
+                } else {
+                  setState(() {
+                    _viewMode = ViewMode.DETAILS;
+                  });
+                }
+              },
+              child: Icon(Icons.arrow_forward, color: Colors.black),
+              backgroundColor: Colors.amberAccent,
+            )
+          : FloatingActionButton(
+              onPressed: () async {
+                final form = _createGroupFormKey.currentState;
+                if (form.validate()) {
+                  form.save();
+                  _group.members = model.selectedMembers;
+                  final user = Provider.of<User>(context, listen: false);
+                  // add user logged into selectedmembers before creating the group
+                  final loggedUser = Member(
+                      id: user.id,
+                      name: user.name,
+                      username: user.username,
+                      profilePicture: user.profilePicture,
+                      isAdmin: true);
+                  var success = await model.createGroup(_group, loggedUser);
+                  if (success) {
+                    print("success $success");
+                    form.reset();
+                    _group = Group();
+                    Navigator.pop(context);
+                  } else {
+                    _group.members.remove(loggedUser);
+                  }
+                }
+              },
+              child: Icon(Icons.check, color: Colors.black),
+              backgroundColor: Colors.amberAccent,
+            ),
     );
   }
 
@@ -165,10 +183,24 @@ class _GroupCreateViewState extends State<GroupCreateView> {
               itemCount: model.friends.length,
               itemBuilder: (context, index) => GroupCreateFriendListItem(
                 friend: model.friends[index],
+                isMember: model.isMember(
+                  Member(
+                      id: model.friends[index].id,
+                      name: model.friends[index].name,
+                      username: model.friends[index].username,
+                      profilePicture: model.friends[index].profilePicture,
+                      isAdmin: false),
+                ),
                 onTap: () {
-                  model.addMember(model.friends[index]);
+                  model.addMember(
+                    Member(
+                        id: model.friends[index].id,
+                        name: model.friends[index].name,
+                        username: model.friends[index].username,
+                        profilePicture: model.friends[index].profilePicture,
+                        isAdmin: false),
+                  );
                 },
-                isMember: model.isMember(model.friends[index]),
               ),
             ),
           );
