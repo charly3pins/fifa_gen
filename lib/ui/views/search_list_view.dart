@@ -62,12 +62,12 @@ class _SearchState extends State<SearchListView> {
                 hintStyle: TextStyle(color: Colors.white)),
           ),
         ),
-        body: buildBody(context, _searchQuery.text, model),
+        body: _buildBody(context, _searchQuery.text, model),
       ),
     );
   }
 
-  Widget buildBody(
+  Widget _buildBody(
       BuildContext context, String query, SearchListViewModel model) {
     // TODO clean logged username correctly
     for (var i = 0; i < model.results.length; i++) {
@@ -94,18 +94,16 @@ class _SearchState extends State<SearchListView> {
           : ListView.builder(
               padding: EdgeInsets.symmetric(vertical: 8.0),
               itemCount: model.results.length,
-              itemBuilder: (BuildContext context, int index) {
+              itemBuilder: (_, int index) {
                 var user = model.results[index];
                 return GestureDetector(
                     onTap: () async {
                       await model
-                          .getFriendship(
-                              widget.user.id, model.results[index].id)
+                          .getFriendship(widget.user.id, user.id)
                           .then((friendship) {
                         Navigator.pushNamed(context, RoutePaths.UserProfile,
                             arguments: UserProfileViewArguments(
-                                user: model.results[index],
-                                friendship: friendship));
+                                user: user, friendship: friendship));
                       });
                     },
                     child: Card(

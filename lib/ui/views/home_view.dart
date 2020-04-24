@@ -2,6 +2,7 @@ import 'package:fifagen/core/constants/app_constants.dart';
 import 'package:fifagen/core/models/user.dart';
 import 'package:fifagen/core/viewmodels/views/home_view_model.dart';
 import 'package:fifagen/ui/views/arguments/user_profile_view_arguments.dart';
+import 'package:fifagen/ui/views/group_list_view.dart';
 import 'package:fifagen/ui/views/notification_list_view.dart';
 import 'package:fifagen/ui/widgets/base_widget.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class _HomeViewState extends State<HomeView> {
   static List<Widget> _widgetOptions = <Widget>[
     Text("Matches"),
     Text("Tournaments"),
-    Text("Groups"),
+    GroupListView(),
   ];
 
   void _onItemTapped(int index) {
@@ -84,8 +85,14 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     print("home_view => Build");
     // TODO check how to avoid the rebuilds bc of this
-    final _user = Provider.of<User>(context);
-    return BaseWidget<HomeViewModel>(
+    var _user = Provider.of<User>(context);
+    return _user == null
+        ? Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : BaseWidget<HomeViewModel>(
             model: HomeViewModel(
                 authenticationService: Provider.of(context),
                 notificationsService: Provider.of(context)),

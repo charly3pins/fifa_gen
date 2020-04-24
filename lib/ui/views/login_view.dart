@@ -16,7 +16,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   AuthMode _authMode = AuthMode.LOGIN;
 
-  final _formKey = GlobalKey<FormState>();
+  final _loginFormKey = GlobalKey<FormState>();
   var _user = User();
 
   @override
@@ -56,7 +56,7 @@ class _LoginViewState extends State<LoginView> {
     return Container(
         padding: const EdgeInsets.symmetric(horizontal: 43.0),
         child: Form(
-          key: _formKey,
+          key: _loginFormKey,
           child: Container(
             alignment: Alignment.center,
             child: SingleChildScrollView(
@@ -122,7 +122,7 @@ class _LoginViewState extends State<LoginView> {
                     color: Colors.white,
                     elevation: 4.0,
                     onPressed: () async {
-                      final form = _formKey.currentState;
+                      final form = _loginFormKey.currentState;
                       if (form.validate()) {
                         form.save();
                         form.reset();

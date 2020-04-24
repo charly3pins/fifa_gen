@@ -15,11 +15,13 @@ class UserProfileViewModel extends BaseModel {
   })  : _api = api,
         _notificationsService = notificationsService;
 
-  List<User> friends;
+  List<User> _friends;
+  List<User> get friends => _friends;
+
   Future findFriends(String userID) async {
     print("findfriends $userID");
     setBusy(true);
-    friends = await _api.findFriends(userID, "friends");
+    _friends = await _api.findFriends(userID, "friends");
     setBusy(false);
   }
 
