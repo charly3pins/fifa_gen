@@ -289,6 +289,9 @@ class _GroupCreateViewState extends State<GroupCreateView> {
             ],
           ),
         ),
+        model.error != null && model.error.isNotEmpty
+            ? SnackBarLauncher(error: model.error)
+            : Container(),
       ],
     );
   }
