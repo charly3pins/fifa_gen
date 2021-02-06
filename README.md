@@ -2,7 +2,11 @@
 
 Fifa Tournaments Generator
 
-## Getting Started
+## About
+
+This is a POC of an app using Flutter to generate a tournaments in FIFA. I've played a bit with Flutter building this app and used a backend in Go you can find it [here](https://github.com/charly3pins/fifa-gen-api)
+
+## Getting Started with Flutter
 
 This project is a starting point for a Flutter application.
 
