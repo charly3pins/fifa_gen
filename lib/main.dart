@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         initialRoute: RoutePaths.Login,
-        onGenerateRoute: Router.generateRoute,
+        onGenerateRoute: MyRouter.generateRoute,
       ),
     );
   }

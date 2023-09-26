@@ -37,7 +37,7 @@ class LoginViewModel extends BaseModel {
     }).catchError((e) {
       print("loginviewmodel => ERROR: $e");
       setBusy(false);
-      setError(e);
+      setError(e.toString());
       return false;
     });
   }

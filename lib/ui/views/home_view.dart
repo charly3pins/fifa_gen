@@ -153,15 +153,15 @@ class _HomeViewState extends State<HomeView> {
                     items: const <BottomNavigationBarItem>[
                       BottomNavigationBarItem(
                         icon: Icon(Icons.calendar_today),
-                        title: Text('Calendar'),
+                        label: 'Calendar',
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.format_list_bulleted),
-                        title: Text('Tournaments'),
+                        label: 'Tournaments',
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.people),
-                        title: Text('Groups'),
+                        label: 'Groups',
                       ),
                     ],
                     currentIndex: _selectedIndex,

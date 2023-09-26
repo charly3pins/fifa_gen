@@ -7,8 +7,9 @@ import 'package:fifagen/core/models/user.dart';
 import 'package:http/http.dart' as http;
 
 class Api {
-  static const _baseUrl = 'http://10.0.2.2:8000';
-  // static const _baseUrl = 'http://192.168.1.59:8000';
+  // static const _baseUrl = 'http://10.0.2.2:8000'; // android simulator
+  static const _baseUrl = 'http://127.0.0.1:8000'; // iOS simulator
+  // static const _baseUrl = 'http://192.168.1.59:8000'; // real phone
 
   var client = new http.Client();
 
@@ -19,8 +20,11 @@ class Api {
     print("Api => logIn");
     String jsonBody = json.encode(user.toJson());
     // TODO add catch and return INTERNAL ERROR if the API is down
-    var response = await client.post("$_baseUrl/token",
-        headers: {"Content-Type": 'application/json'}, body: jsonBody);
+    var response = await client
+        .post("$_baseUrl/token",
+            headers: {"Content-Type": 'application/json'}, body: jsonBody)
+        .onError(
+            (error, stackTrace) => throw (Errors.InvalidUsernameOrPassword));
 
     if (response.statusCode == 200) {
       print("API => OK");
